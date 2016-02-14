@@ -29,8 +29,8 @@ can (and is licensed to) run.
 
 ### 1.2. Calc App
 
-> The most fundamental tenet in calc.js is the decoupling of the calc app from
-> the calc engine and from the UI.
+> __The most fundamental tenet in calc.js is the decoupling of the calc app from
+> the calc engine and from the UI.__
 
 First, what's a calc app? A calc app consists of spreadsheet cell definitions -
 formulas and values, plus some calculation-related settings.
@@ -95,18 +95,54 @@ execute apps from the above calc app store.
 
 ## 3. Platform Specification
 
-__Note__: It is not recommended for calc apps to use this internal API.
-This section is intended for contributors to this project or 
-for advanced calc app developers who want to understand how the platform works.
+__Note__: It is not recommended for calc apps to use these internal components directly.
+It is provided for advanced calc app developers to understand how the platform works.
   
+All objects belong to the ___calcjs__ namespace. 
+The namespace is intentionally prefixed with "_" to avoid any accidental use.
+
+This section only provides an overview of the functionality exposed by each platform
+component.
+For details on any particular API, please refer to the header comments in the source tree.
+
 
 ### 3.1. App
 
-### 3.2. Processor
- 
-### 3.3. Store
+#### Source Code Location
+[src/calcjs/app.ts](../src/calcjs/app.ts)
 
-### 3.4. Designer
+#### Purpose
+This component contains and manipulates everything related to values and formulas.
+The cells are stored in a 2-dimentional array.
+However, that array should not be accessed directly.
+There is a public function for that purpose.
+
+This component also contains and manipulates a list of user-provided libraries.
+In order to upload an app to a [store](#34-store), any such user-provided library must
+be referenced using an absolute URI.  
+
+This component doesn't contain any transient state related to a current execution. 
+That is stored in the [app session](#32-app-session).
+
+#### Dependencies
+This component has no dependencies.
+
+[App session](#32-app-session), [Processor](#33-processor), [Store](#34-store), and 
+[Designer](#35-designer) depend on this component.
+
+#### Serialization
+This component can be serialized and deserialized without any loss.
+
+> __TODO:__ Define the exact format here. 
+
+
+### 3.2. App Session
+
+### 3.3. Processor
+ 
+### 3.4. Store
+
+### 3.5. Designer
 
 
 
