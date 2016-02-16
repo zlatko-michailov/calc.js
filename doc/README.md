@@ -13,18 +13,17 @@ _Complex calculations for every device!_
 * [2. How calc.js Can Be Used](#2-how-calcjs-can-be-used)
 * [3. How calc.js Works](#3-how-calcjs-works)
 * [4. Tutuorial](#4-tutorial)
-    * [4.1. How to write a constant value](#41-how-to-write-a-constant-value)
-    * [4.2. How to write a formula](#42-how-to-write-a-formula)
-    * [4.3. How to write an iterator](#43-how-to-write-an-iterator)
+    * [4.1. How to Write a Constant Value](#41-how-to-write-a-constant-value)
+    * [4.2. How to Write a Formula](#42-how-to-write-a-formula)
+    * [4.3. How to Write an Iterator](#43-how-to-write-an-iterator)
+    * [4.4. How to Import a Custom Library](#44-how-to-import-a-custom-library)
 * [5. API Reference](#5-api-reference)
-    * [5.1. Error codes](#51-error-codes)
-    * [5.2. __ref__ Object](#52-ref-objects)
-    * [5.3. __rc__ and __cr__ Functions](#53-rc-and-cr-functions)
-    * [5.4. __value__ Function](#54-value-function)
-    * [5.5. __foreach__ Function](#55-foreach-function)
+    * [5.1. Error Codes](#51-error-codes)
+    * [5.2. ``ref`` Object](#52-ref-object)
+    * [5.3. ``rc`` and ``cr`` Functions](#53-rc-and-cr-functions)
+    * [5.4. ``value`` Function](#54-value-function)
+    * [5.5. ``foreach`` Function](#55-foreach-function)
     * [5.6. Built-In Libraries](#56-built-in-libraries)
-        * [5.6.1. __libs/aggregates.js__ Library](#561-aggregates)
-        * [5.6.2. __libs/fillers.js__ Library](#562-fillers)
 * [6. Platform Internals](#6-platform-internals)
     * [6.1. App](#61-app)
     * [6.2. App Session](#62-app-session)
@@ -124,7 +123,7 @@ Everything else is naturally handled by the JavaScript engine.
 
 
 ## 4. Tutuorial
-### 4.1. How to write a constant value
+### 4.1. How to Write a Constant Value
 
 The simplest way to write a constant value is to write a literal:
 ```javascript
@@ -166,7 +165,7 @@ That function will never be executed again:
 ```
 
 
-### 4.2. How to write a formula
+### 4.2. How to Write a Formula
 
 Formulas are simply JavaScript functions with no parameters.
 ```javascript
@@ -196,7 +195,156 @@ function() {
 ``` 
 
 
-### 4.3. How to write an iterator
+### 4.3. How to Write an Iterator
+
+One big thing that traditional spreadhseet programs lack is callbacks.
+calc.js makes JavaScript callbacks available to the calc app developer through
+the ``foreach`` function.
+
+```javascript
+function sum(ref1, ref2) {
+    // Initialize the sum to 0.
+    var s = 0;
+    
+    // Iterate over the range cells
+    foreach(ref1, ref2, function(ref) {
+	   // If a cell has a number value, add it to the sum.
+       var v = value(ref);
+       if (hasValue(ref) && typeof v == "number") {
+           s += v;
+       } 
+    });
+    
+    // Return the accumulated sum.
+    return s;
+}
+```
+
+__Note__: You can also write iterators that have side effects - 
+iterators that change other cells.
+
+
+
+## 5. API Reference
+### 5.1. Error Codes
+
+All error codes are strings values.
+
+#### 5.1.1. ``"#REF!"``
+__Bad Reference__ - a formula is trying to referece a non-existent cell. 
+
+#### 5.1.2. ``"#CIRC!"``
+__Circular Dependency__ - a circular dependency has been detected during calculation.
+
+#### 5.1.3. ``"#EVAL!"``
+__Evaluation Error__ - a formula's evaluation has thrown an exception.
+
+#### 5.1.4. ``"#VOID!"``
+__Void Formula__ - a formula doesn't return a result.
+Most likely that formula has side effects.
+
+
+### 5.2. ``ref`` Object
+An instance of the ``ref`` object is used to reference a cell.
+All built-in functions that access cells or ranges of cells take a paramater of this type.
+
+```javascript
+{
+    row: "<row id>",
+    col: "<col id>"
+    sheet: "<sheet id>",
+}
+``` 
+
+#### Example
+
+```javascript
+{
+    row: "a2s4f",
+    col: "w6g1r"
+    sheet: "k5j2h",
+}
+``` 
+
+
+### 5.3. ``rc`` and ``cr`` Functions
+
+These are convenience shortcuts that construct and return a ``ref`` object.
+These functions convert the row and column indeces into ID's.
+That is important because the row/column index of a cell may change when rows/columns
+are added/deleted while the row/column ID's a permanent.
+
+Just like some people are half-full'ers while others are half-empty'ers, 
+some people are row-col'ers while other s are col-row'ers.
+That's why calc.js offers a shortcut for each kind of people.
+ ``rc`` takes row first than column while ``cr`` takes column first then row.
+ The sheet parameter is optional for both functions.
+
+```javascript
+function rc(row, col, sheet) ... 
+function cr(col, row, sheet) ... 
+```
+
+#### Example
+
+```javascript
+// References the cell at row 10, column 15.
+rc(10,15) 
+```
+
+
+### 5.4. ``value`` Function
+
+This function gets the value of a given cell refernced by the given ``ref`` parameter.
+
+```javascript
+function value(ref) ... 
+```
+
+#### Example
+
+```javascript
+// Gets the value of the cell at row 10, column 20.
+value(rc(10,20)) 
+```
+
+
+### 5.5. ``foreach`` Function
+
+This function invokes the given callback for each cell of the specified range
+passing in the current cell's reference.
+
+```javascript
+function foreach(ref1, ref2, callback) ... 
+```
+
+#### Example
+
+```javascript
+// Gets the maximum value in the given range.
+function max(ref1, ref2) {
+    // Initialize the max to "unset".
+    var mx = null;
+    
+    // Iterate over the range cells
+    foreach(ref1, ref2, function(ref) {
+	   // If a cell has a number value, consider it.
+       var v = value(ref);
+       if (hasValue(ref) && typeof v == "number" &&
+           (mx == null || mx < v)) {
+           mx = v;
+       } 
+    });
+    
+    // Return the accumulated max value.
+    return mx;
+}
+```
+
+
+### 5.6. Built-In Libraries
+#### 5.6.1. ``libs/aggregates.js``
+#### 5.6.2. ``libs/fillers.js``
 
 
 
@@ -205,7 +353,7 @@ function() {
 __Note__: It is not recommended for calc apps to use these internal components directly.
 This section is provided for advanced calc app developers to understand how the platform works.
   
-All objects belong to the ___calcjs__ namespace. 
+All objects belong to the ``_calcjs`` namespace. 
 The namespace is intentionally prefixed with "_" to avoid any accidental use.
 
 This section only provides an overview of the functionality exposed by each platform
