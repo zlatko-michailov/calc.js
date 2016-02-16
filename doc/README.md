@@ -18,12 +18,13 @@ _Complex calculations for every device!_
     * [4.3. How to write an iterator](#43-how-to-write-an-iterator)
 * [5. API Reference](#5-api-reference)
     * [5.1. Error codes](#51-error-codes)
-    * [5.2. __ _ref_ __ Object](#52-ref-objects)
-    * [5.3. __ _value_ __ Function](#53-value-function)
-    * [5.4. __ _foreach_ __ Function](#54-foreach-function)
-    * [5.5. Built-In Libraries](#55-built-in-libraries)
-        * [5.5.1. __ _libs/aggregates.js_ __ Library](#551-aggregates)
-        * [5.5.2. __ _libs/fillers.js_ __ Library](#552-fillers)
+    * [5.2. __ref__ Object](#52-ref-objects)
+    * [5.3. __rc__ and __cr__ Functions](#53-rc-and-cr-functions)
+    * [5.4. __value__ Function](#54-value-function)
+    * [5.5. __foreach__ Function](#55-foreach-function)
+    * [5.6. Built-In Libraries](#56-built-in-libraries)
+        * [5.6.1. __libs/aggregates.js__ Library](#561-aggregates)
+        * [5.6.2. __libs/fillers.js__ Library](#562-fillers)
 * [6. Platform Internals](#6-platform-internals)
     * [6.1. App](#61-app)
     * [6.2. App Session](#62-app-session)
@@ -180,10 +181,10 @@ function() {
 ``` 
 
 In most cases you'll need to write a simple expression like: 
-"_add the values of cell(x,y) and cell(v,w)_".
+"_add the values of cell(r1,c1) and cell(r2,c2)_".
 In that case you can take a shortcut:
 ```javascript
-= value({ "row": x, "col": y }) + value({ "row": v, "col": w })
+= value(rc(r1,c1) + value(rc(r2,c2))
 ``` 
 
 Notice the "=" prefix.
