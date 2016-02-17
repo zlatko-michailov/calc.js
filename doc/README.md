@@ -18,12 +18,14 @@ _Complex calculations for every device!_
     * [4.3. How to Write an Iterator](#43-how-to-write-an-iterator)
     * [4.4. How to Import a Custom Library](#44-how-to-import-a-custom-library)
 * [5. API Reference](#5-api-reference)
-    * [5.1. Error Codes](#51-error-codes)
-    * [5.2. ``ref`` Object](#52-ref-object)
-    * [5.3. ``rc`` and ``cr`` Functions](#53-rc-and-cr-functions)
-    * [5.4. ``value`` Function](#54-value-function)
-    * [5.5. ``foreach`` Function](#55-foreach-function)
-    * [5.6. Built-In Libraries](#56-built-in-libraries)
+    * [5.1. Global Objects and Functions](#51-global-objects-and-functions)
+        * [5.1.1. Error Codes](#511-error-codes)
+        * [5.1.2. ``ref`` Object](#512-ref-object)
+        * [5.1.3. ``rc`` and ``cr`` Functions](#513-rc-and-cr-functions)
+        * [5.1.4. ``value`` Function](#514-value-function)
+        * [5.1.5. ``foreach`` Function](#515-foreach-function)
+    * [5.2. Built-In Libraries](#56-built-in-libraries)
+        * [5.2.1. ``libs/aggregates.js``](#521-libsaggregatesjs)
 * [6. Platform Internals](#6-platform-internals)
     * [6.1. App](#61-app)
     * [6.2. App Session](#62-app-session)
@@ -224,27 +226,54 @@ __Note__: You can also write iterators that have side effects -
 iterators that change other cells.
 
 
+### 4.4. How to Import a Custom Library
+
+calc.js libraries are just JavaScript files.
+It is recommended that a library has no dependencies or depends only on built-in libraries.
+That is because calc.js has no mechanism to track function dependencies.
+If you still want to break your own support functionality into smaller libraries,
+name the files using a "prefix" notation that would suggest to the user that library
+_foo.bar.js_ depends on library _foo.js_.
+
+
+You have to explicitly import the desired libraries into the calc apps that need them.
+Ultimately, that will reflect on the calc app serialization file.
+
+To do it interactively, look up the documentation for the UI tool you are using to
+design your app.
+ 
+Keep in mind that libraries are "_referenced_", not "_embedded_", i.e.
+if a library changes after the app has been written, it may affect the app's behavior.
+
+If you plan to use the calc app that imports a particular library only locally,
+then there is no restriction on the location of the JavaScript library.
+However, if you plan to upload that calc app to a remote service, then the library
+must be accessible from the service.
+    
+
 
 ## 5. API Reference
-### 5.1. Error Codes
+### 5.1. Global Objects and Functions
+
+#### 5.1.1. Error Codes
 
 All error codes are strings values.
 
-#### 5.1.1. ``"#REF!"``
+##### 5.1.1.1. ``"#REF!"``
 __Bad Reference__ - a formula is trying to referece a non-existent cell. 
 
-#### 5.1.2. ``"#CIRC!"``
+##### 5.1.1.2. ``"#CIRC!"``
 __Circular Dependency__ - a circular dependency has been detected during calculation.
 
-#### 5.1.3. ``"#EVAL!"``
+##### 5.1.1.3. ``"#EVAL!"``
 __Evaluation Error__ - a formula's evaluation has thrown an exception.
 
-#### 5.1.4. ``"#VOID!"``
+##### 5.1.1.4. ``"#VOID!"``
 __Void Formula__ - a formula doesn't return a result.
 Most likely that formula has side effects.
 
 
-### 5.2. ``ref`` Object
+#### 5.1.2. ``ref`` Object
 An instance of the ``ref`` object is used to reference a cell.
 All built-in functions that access cells or ranges of cells take a paramater of this type.
 
@@ -256,7 +285,7 @@ All built-in functions that access cells or ranges of cells take a paramater of 
 }
 ``` 
 
-#### Example
+##### Example
 
 ```javascript
 {
@@ -267,7 +296,7 @@ All built-in functions that access cells or ranges of cells take a paramater of 
 ``` 
 
 
-### 5.3. ``rc`` and ``cr`` Functions
+#### 5.1.3. ``rc`` and ``cr`` Functions
 
 These are convenience shortcuts that construct and return a ``ref`` object.
 These functions convert the row and column indeces into ID's.
@@ -285,7 +314,7 @@ function rc(row, col, sheet) ...
 function cr(col, row, sheet) ... 
 ```
 
-#### Example
+##### Example
 
 ```javascript
 // References the cell at row 10, column 15.
@@ -293,7 +322,7 @@ rc(10,15)
 ```
 
 
-### 5.4. ``value`` Function
+#### 5.1.4. ``value`` Function
 
 This function gets the value of a given cell refernced by the given ``ref`` parameter.
 
@@ -301,7 +330,7 @@ This function gets the value of a given cell refernced by the given ``ref`` para
 function value(ref) ... 
 ```
 
-#### Example
+##### Example
 
 ```javascript
 // Gets the value of the cell at row 10, column 20.
@@ -309,7 +338,7 @@ value(rc(10,20))
 ```
 
 
-### 5.5. ``foreach`` Function
+#### 5.1.5. ``foreach`` Function
 
 This function invokes the given callback for each cell of the specified range
 passing in the current cell's reference.
@@ -318,7 +347,7 @@ passing in the current cell's reference.
 function foreach(ref1, ref2, callback) ... 
 ```
 
-#### Example
+##### Example
 
 ```javascript
 // Gets the maximum value in the given range.
@@ -342,9 +371,32 @@ function max(ref1, ref2) {
 ```
 
 
-### 5.6. Built-In Libraries
-#### 5.6.1. ``libs/aggregates.js``
-#### 5.6.2. ``libs/fillers.js``
+
+### 5.2. Built-In Libraries
+
+#### 5.2.1. ``libs/aggregates.js``
+
+This library contains essential aggregate functions.
+All of these functions take two cell references that represent opposite corners
+of a range.
+They take into account ``number`` values and ignore all other values.
+
+```javascript
+// Average 
+function avg(ref1, ref2) ...
+
+// Count 
+function count(ref1, ref2) ...
+
+// Maximum 
+function max(ref1, ref2) ...
+
+// Minimum 
+function min(ref1, ref2) ...
+
+// Sum 
+function sum(ref1, ref2) ...
+```
 
 
 
@@ -364,24 +416,22 @@ source tree - [src/platform/calcjs](../src/platform/calcjs).
 
 ### 6.1. App
 
-This component represents a static calc model - values and formulas.
+An app represents a static calc model - values and formulas.
+It also contains and manipulates a list of user-provided JavaScript libraries.
 
-This component also contains and manipulates a list of user-provided libraries.
-In order to upload an app to a store, any such user-provided library must
-be referenced using an absolute URI or it must be built-in.  
-
-This component doesn't contain any transient state related to a current execution. 
+An app doesn't contain any transient state related to a current execution. 
 That is stored in the app session.
 
 #### Serialization Format
-This component can be serialized and deserialized without any loss.
+An app can be serialized and deserialized without any loss.
+That's how an app can get uploaded to a store and fetched from a store.
 
 > __TODO:__ Define the exact format here. 
 
 
 ### 6.2. App Session
 
-This component wraps around an app and adds transient state related to the app's execution.
+An app session wraps around an app and adds transient state related to the app's execution.
 Decoupling this state from the app allows apps to be executed concurrently
 by the same hosting service.
 
@@ -393,7 +443,7 @@ There is a public function for that purpose.
 
 ### 6.3. Processor
 
-This component recalculates the formula graphs when needed.
+A processor recalculates the formula graphs when needed.
 It wraps a static app in a transient app session.
 Thus an app can be loaded and executed as part of multiple app sessions concurrently.
 
