@@ -12,7 +12,7 @@ _Complex calculations for every device!_
     * [1.6. Extensibility](#16-extensibility)
 * [2. How calc.js Can Be Used](#2-how-calcjs-can-be-used)
 * [3. How calc.js Works](#3-how-calcjs-works)
-* [4. Tutuorial](#4-tutorial)
+* [4. Tutorial](#4-tutorial)
     * [4.1. How to Write a Constant Value](#41-how-to-write-a-constant-value)
     * [4.2. How to Write a Formula](#42-how-to-write-a-formula)
     * [4.3. How to Write an Iterator](#43-how-to-write-an-iterator)
@@ -24,7 +24,7 @@ _Complex calculations for every device!_
         * [5.1.3. ``rc`` and ``cr`` Functions](#513-rc-and-cr-functions)
         * [5.1.4. ``value`` Function](#514-value-function)
         * [5.1.5. ``foreach`` Function](#515-foreach-function)
-    * [5.2. Built-In Libraries](#56-built-in-libraries)
+    * [5.2. Built-In Libraries](#52-built-in-libraries)
         * [5.2.1. ``libs/aggregates.js``](#521-libsaggregatesjs)
 * [6. Platform Internals](#6-platform-internals)
     * [6.1. App](#61-app)
@@ -124,7 +124,7 @@ Everything else is naturally handled by the JavaScript engine.
 
 
 
-## 4. Tutuorial
+## 4. Tutorial
 ### 4.1. How to Write a Constant Value
 
 The simplest way to write a constant value is to write a literal:
