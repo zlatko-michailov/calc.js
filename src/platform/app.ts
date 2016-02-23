@@ -27,21 +27,33 @@ namespace CalcJS {
     export class App {
         public options: AppOptions;
         public sheets: DualSparseArray<Sheet>;
+        
+        public constructor() {
+            this.sheets = new DualSparseArray<Sheet>(() => new Sheet());
+        }
     }
     
     export class Sheet {
         public columns: DualSparseArray<Column>;
+        
+        public constructor() {
+            this.columns = new DualSparseArray<Column>(() => new Column());
+        }
     }
     
     export class Column {
-        public columns: DualSparseArray<Cell>;
+        public cells: DualSparseArray<Cell>;
+        
+        public constructor() {
+            this.cells = new DualSparseArray<Cell>(() => new Cell());
+        }
     }
     
     export class Cell {
-        
+        // TODO:
     }
     
     export class AppOptions {
-        
+        // TODO:
     }
 }

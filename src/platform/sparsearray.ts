@@ -25,20 +25,49 @@ SOFTWARE.
 
 namespace CalcJS {
     export class DualSparseArray<T> {
+        private nextId: number;
+        private elementConstructor: () => T;
         private byId: SparseArray<T>;
         private byIndex: SparseArray<T>;
         
-        public ensureElementAt(index: number) : void {
+        public constructor(elementConstructor: () => T) {
+            this.elementConstructor = elementConstructor;
+        }
+        
+        public getElementById(id: number) : T {
+            // TODO:
+            return undefined;
+        }
+        
+        public setElementById(id: number, value: T) : void {
+            // TODO:
+        }
+        
+        public getElementByIndex(index: number) : T {
+            // TODO:
+            return undefined;
+        }
+        
+        public setElementByIndex(index: number, value: T) : void {
+            // TODO:
         }
     }
     
+    
     export class SparseArray<T> {
-        [i: number]: T;
+        private elementConstructor: () => T;
         
-        public ensureElementAt(i: number) : void {
-            if (this[i] === undefined) {
-                this[i] = new T();
+        public constructor(elementConstructor: () => T) {
+            this.elementConstructor = elementConstructor;
+        }
+        
+        [index: number]: T;
+        
+        public ensureElementAt(index: number) : void {
+            if (!this[index]) {
+                this[index] = this.elementConstructor();
             }
         }
     }
+    
 }
