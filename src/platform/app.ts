@@ -23,34 +23,46 @@ SOFTWARE.
 */
 
 
+/// <reference path="../util/arrays.ts" />
+/// <reference path="ref.ts" />
+
+
 namespace CalcJS {
+    export class AppSession {
+        private app: App;
+        private contextCellStack: Util.Stack<CellRef>;
+        private calcRunId: number;
+    }
+    
+    
     export class App {
         public options: AppOptions;
-        public sheets: DualSparseArray<Sheet>;
+        public sheets: Util.DualSparseArray<Sheet>;
         
         public constructor() {
-            this.sheets = new DualSparseArray<Sheet>(() => new Sheet());
+            this.sheets = new Util.DualSparseArray<Sheet>(() => new Sheet());
         }
     }
     
     export class Sheet {
-        public columns: DualSparseArray<Column>;
+        public columns: Util.DualSparseArray<Column>;
         
         public constructor() {
-            this.columns = new DualSparseArray<Column>(() => new Column());
+            this.columns = new Util.DualSparseArray<Column>(() => new Column());
         }
     }
     
     export class Column {
-        public cells: DualSparseArray<Cell>;
+        public cells: Util.DualSparseArray<Cell>;
         
         public constructor() {
-            this.cells = new DualSparseArray<Cell>(() => new Cell());
+            this.cells = new Util.DualSparseArray<Cell>(() => new Cell());
         }
     }
     
     export class Cell {
-        // TODO:
+        public formula: () => any;
+        public value: any;
     }
     
     export class AppOptions {

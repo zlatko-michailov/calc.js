@@ -23,46 +23,15 @@ SOFTWARE.
 */
 
 
-// These functions are for user's convenience. 
-// They must remain in the global namesapce.
-export function cr(colIndex: CalcJS.RefValue, rowIndex: CalcJS.RefValue, sheetIndex?: CalcJS.RefValue) : CalcJS.CellRef {
-    return new CalcJS.CellRef(
-                new CalcJS.RefUnit(CalcJS.RefKind.ById, colIndex), 
-                new CalcJS.RefUnit(CalcJS.RefKind.ById, rowIndex), 
-                new CalcJS.RefUnit(CalcJS.RefKind.ById, sheetIndex));
-}
-
-export function c$r(colIndex: CalcJS.RefValue, rowIndex: CalcJS.RefValue, sheetIndex?: CalcJS.RefValue) : CalcJS.CellRef {
-    return new CalcJS.CellRef(
-                new CalcJS.RefUnit(CalcJS.RefKind.ByIndex, colIndex), 
-                new CalcJS.RefUnit(CalcJS.RefKind.ById, rowIndex), 
-                new CalcJS.RefUnit(CalcJS.RefKind.ById, sheetIndex));
-}
-
-export function cr$(colIndex: CalcJS.RefValue, rowIndex: CalcJS.RefValue, sheetIndex?: CalcJS.RefValue) : CalcJS.CellRef {
-    return new CalcJS.CellRef(
-                new CalcJS.RefUnit(CalcJS.RefKind.ById, colIndex), 
-                new CalcJS.RefUnit(CalcJS.RefKind.ByIndex, rowIndex), 
-                new CalcJS.RefUnit(CalcJS.RefKind.ById, sheetIndex));
-}
-
-export function c$r$(colIndex: CalcJS.RefValue, rowIndex: CalcJS.RefValue, sheetIndex?: CalcJS.RefValue) : CalcJS.CellRef {
-    return new CalcJS.CellRef(
-                new CalcJS.RefUnit(CalcJS.RefKind.ByIndex, colIndex), 
-                new CalcJS.RefUnit(CalcJS.RefKind.ByIndex, rowIndex), 
-                new CalcJS.RefUnit(CalcJS.RefKind.ById, sheetIndex));
-}
-
-
 namespace CalcJS {
     export class CellRef {
-        public constructor(colRef: RefUnit, rowRef: RefUnit, sheetRef?: RefUnit) {
-            this.colRef = colRef;
+        public constructor(columnRef: RefUnit, rowRef: RefUnit, sheetRef?: RefUnit) {
+            this.columnRef = columnRef;
             this.rowRef = rowRef;
             this.sheetRef = sheetRef;
         }
         
-        public colRef: RefUnit;
+        public columnRef: RefUnit;
         public rowRef: RefUnit;
         public sheetRef: RefUnit;
     }
