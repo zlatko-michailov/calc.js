@@ -80,5 +80,4 @@ namespace CalcJS.Util {
             this[index] = value;
         }
     }
-    
 }
