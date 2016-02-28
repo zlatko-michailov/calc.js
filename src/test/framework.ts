@@ -25,12 +25,14 @@ SOFTWARE.
 
 import * as Arrays from "../util/arrays";
 
+import * as TestArrays from "./util/arrays";
+
 
 export class Framework {
     public static run(): void {
         let passed: boolean = true;
         
-        passed = this.execute("util/arrays/Stack", this.testStack) && passed;
+        passed = this.execute("util/arrays/Stack", TestArrays.TestArrays.testStack) && passed;
         passed = this.execute("util/arrays/SparseArray", this.testSparseArray) && passed;
         
         this.log(LogLevel.Important);
