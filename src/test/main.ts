@@ -23,97 +23,94 @@ SOFTWARE.
 */
 
 
-/// <reference path="../util/arrays.ts" />
+import * as Arrays from "../util/arrays";
 
 
-namespace CalcJS.Test {
-    
-    export class UnitTests {
-        public static main(): void {
-            let passed: boolean = true;
-            
-            passed = this.execute("CalcJS.Util.Stack", this.testStack) && passed;
-            passed = this.execute("CalcJS.Util.SparseArray", this.testSparseArray) && passed;
-            
-            this.log(LogLevel.Important);
-            this.log(LogLevel.Important, "=================");
-            this.log(LogLevel.Important, passed ? "[Passed]" : "[+++ FAILED +++]" );
-        }
+export class Framework {
+    public static run(): void {
+        let passed: boolean = true;
         
-        public static log(level: string, message?: string, ...args: any[]): void {
-            if (message) {
-                let levelMessage: string = level + message;
-                
-                if (args && args.length > 0) {
-                    console.log(levelMessage, args);
-                }
-                else {
-                    console.log(levelMessage);
-                }
+        passed = this.execute("util/arrays/Stack", this.testStack) && passed;
+        passed = this.execute("util/arrays/SparseArray", this.testSparseArray) && passed;
+        
+        this.log(LogLevel.Important);
+        this.log(LogLevel.Important, "=================");
+        this.log(LogLevel.Important, passed ? "[Passed]" : "[+++ FAILED +++]" );
+    }
+    
+    public static log(level: string, message?: string, ...args: any[]): void {
+        if (message) {
+            let levelMessage: string = level + message;
+            
+            if (args && args.length > 0) {
+                console.log(levelMessage, args);
             }
             else {
-                console.log(level);
+                console.log(levelMessage);
             }
         }
-        
-        public static areEqual<T>(expected: T, actual: T, logLevel: string, message: string) : boolean {
-            let passed = expected == actual;
-            if (!passed) {
-                logLevel = LogLevel.Important;
-            }
-            
-            UnitTests.log(logLevel, message, [{ expected: expected, actual: actual}]);
-            return passed;
-        }
-        
-        private static execute(testName: string, testMethod: () => boolean): boolean {
-            this.log(LogLevel.Important);
-            this.log(LogLevel.Important, testName);
-            this.log(LogLevel.Important, "---------------------------------------");
-            var passed: boolean = testMethod();
-            this.log(LogLevel.Important, passed ? "PASSED" : "+++ FAILED +++" );
-            
-            return passed;
-        }
-        
-        private static testStack(): boolean {
-            let stack: CalcJS.Util.Stack<number> = new CalcJS.Util.Stack<number>();
-            let passed: boolean = true;
-            
-            stack.push(42);
-            stack.push(2016);
-            stack.push(26);
-            passed = UnitTests.areEqual(26, stack.pop(), LogLevel.Info, "pop") && passed;
-            stack.push(2);
-            stack.push(23);
-            passed = UnitTests.areEqual(23, stack.pop(), LogLevel.Info, "pop") && passed;
-            passed = UnitTests.areEqual(2, stack.pop(), LogLevel.Info, "pop") && passed;
-            passed = UnitTests.areEqual(2016, stack.pop(), LogLevel.Info, "pop") && passed;
-            passed = UnitTests.areEqual(42, stack.pop(), LogLevel.Info, "pop") && passed;
-            passed = UnitTests.areEqual(0, stack.length, LogLevel.Info, "empty") && passed;
-            
-           return false;
-        }
-        
-        private static testSparseArray(): boolean {
-           UnitTests.log(LogLevel.Info, "one"); 
-           UnitTests.log(LogLevel.Detail, "two"); 
-           UnitTests.log(LogLevel.Verbose, "three"); 
-           UnitTests.log(LogLevel.Detail, "four"); 
-           UnitTests.log(LogLevel.Info, "five"); 
-            
-           return true;
+        else {
+            console.log(level);
         }
     }
     
-     
-    export class LogLevel {
-        public static Important: string = "";
-        public static Info: string = "|   ";
-        public static Detail: string = "|   |   ";
-        public static Verbose: string = "|   |   |   ";
+    public static areEqual<T>(expected: T, actual: T, logLevel: string, message: string) : boolean {
+        let passed = expected == actual;
+        if (!passed) {
+            logLevel = LogLevel.Important;
+        }
+        
+        Framework.log(logLevel, message, { expected: expected, actual: actual});
+        return passed;
+    }
+    
+    private static execute(testName: string, testMethod: () => boolean): boolean {
+        this.log(LogLevel.Important);
+        this.log(LogLevel.Important, testName);
+        this.log(LogLevel.Important, "---------------------------------------");
+        var passed: boolean = testMethod();
+        this.log(LogLevel.Important, passed ? "PASSED" : "+++ FAILED +++" );
+        
+        return passed;
+    }
+    
+    private static testStack(): boolean {
+        let stack: Arrays.Stack<number> = new Arrays.Stack<number>();
+        let passed: boolean = true;
+        
+        stack.push(42);
+        stack.push(2016);
+        stack.push(26);
+        passed = Framework.areEqual(26, stack.pop(), LogLevel.Info, "pop") && passed;
+        stack.push(2);
+        stack.push(23);
+        passed = Framework.areEqual(23, stack.pop(), LogLevel.Info, "pop") && passed;
+        passed = Framework.areEqual(2, stack.pop(), LogLevel.Info, "pop") && passed;
+        passed = Framework.areEqual(2016, stack.pop(), LogLevel.Info, "pop") && passed;
+        passed = Framework.areEqual(42, stack.pop(), LogLevel.Info, "pop") && passed;
+        passed = Framework.areEqual(0, stack.length, LogLevel.Info, "empty") && passed;
+        
+        return passed;
+    }
+    
+    private static testSparseArray(): boolean {
+        Framework.log(LogLevel.Info, "one"); 
+        Framework.log(LogLevel.Detail, "two"); 
+        Framework.log(LogLevel.Verbose, "three"); 
+        Framework.log(LogLevel.Detail, "four"); 
+        Framework.log(LogLevel.Info, "five"); 
+        
+        return true;
     }
 }
 
+    
+export class LogLevel {
+    public static Important: string = "";
+    public static Info: string = "|   ";
+    public static Detail: string = "|   |   ";
+    public static Verbose: string = "|   |   |   ";
+}
 
-CalcJS.Test.UnitTests.main();
+
+Framework.run();
