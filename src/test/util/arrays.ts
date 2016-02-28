@@ -1,27 +1,69 @@
+/**
+The MIT License (MIT)
 
-import * as Arrays from "../../util/arrays";
+Copyright (c) 2016 Zlatko Michailov 
 
-import * as Test from "../framework";
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-export class TestArrays {
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+
+import * as Util_Arrays from "../../util/arrays";
+import * as Test_Main from "../main";
+
+
+export class Tests {
     public static testStack(): boolean {
-        let stack: Arrays.Stack<number> = new Arrays.Stack<number>();
+        let stack: Util_Arrays.Stack<number> = new Util_Arrays.Stack<number>();
         let passed: boolean = true;
         
         stack.push(42);
         stack.push(2016);
         stack.push(26);
-        passed = Test.Framework.areEqual(26, stack.pop(), Test.LogLevel.Info, "pop") && passed;
+        passed = Test_Main.Framework.areEqual(26, stack.pop(), Test_Main.LogLevel.Info, "pop") && passed;
         stack.push(2);
         stack.push(23);
-        passed = Test.Framework.areEqual(23, stack.pop(), Test.LogLevel.Info, "pop") && passed;
-        passed = Test.Framework.areEqual(2, stack.pop(), Test.LogLevel.Info, "pop") && passed;
-        passed = Test.Framework.areEqual(2016, stack.pop(), Test.LogLevel.Info, "pop") && passed;
-        passed = Test.Framework.areEqual(42, stack.pop(), Test.LogLevel.Info, "pop") && passed;
-        passed = Test.Framework.areEqual(0, stack.length, Test.LogLevel.Info, "empty") && passed;
+        passed = Test_Main.Framework.areEqual(23, stack.pop(), Test_Main.LogLevel.Info, "pop") && passed;
+        passed = Test_Main.Framework.areEqual(2, stack.pop(), Test_Main.LogLevel.Info, "pop") && passed;
+        passed = Test_Main.Framework.areEqual(2016, stack.pop(), Test_Main.LogLevel.Info, "pop") && passed;
+        passed = Test_Main.Framework.areEqual(42, stack.pop(), Test_Main.LogLevel.Info, "pop") && passed;
+        passed = Test_Main.Framework.areEqual(0, stack.length, Test_Main.LogLevel.Info, "empty") && passed;
         
         return passed;
     }
     
-    
+    public static testSparseArray(): boolean {
+        Test_Main.Framework.log(Test_Main.LogLevel.Info, "one"); 
+        Test_Main.Framework.log(Test_Main.LogLevel.Detail, "two"); 
+        Test_Main.Framework.log(Test_Main.LogLevel.Verbose, "three"); 
+        Test_Main.Framework.log(Test_Main.LogLevel.Detail, "four"); 
+        Test_Main.Framework.log(Test_Main.LogLevel.Info, "five"); 
+        
+        return false;
+    }
+
+    public static testDualSparseArray(): boolean {
+        Test_Main.Framework.log(Test_Main.LogLevel.Info, "one"); 
+        Test_Main.Framework.log(Test_Main.LogLevel.Detail, "two"); 
+        Test_Main.Framework.log(Test_Main.LogLevel.Verbose, "three"); 
+        Test_Main.Framework.log(Test_Main.LogLevel.Detail, "four"); 
+        Test_Main.Framework.log(Test_Main.LogLevel.Info, "five"); 
+        
+        return false;
+    }
 }

@@ -26,46 +26,51 @@ SOFTWARE.
 /// <reference path="../util/arrays.ts" />
 /// <reference path="ref.ts" />
 
+import * as Platform_Ref from "./ref";
+import * as Util_Arrays from "../util/arrays";
 
-namespace CalcJS {
-    export class AppSession {
-        private app: App;
-        private contextCellStack: Util.Stack<CellRef>;
-        private calcRunId: number;
-    }
+
+export class AppSession {
+    private app: App;
+    private contextCellStack: Util_Arrays.Stack<Platform_Ref.CellRef>;
+    private calcRunId: number;
+}
+
+
+export class App {
+    public options: AppOptions;
+    public sheets: Util_Arrays.DualSparseArray<Sheet>;
     
-    
-    export class App {
-        public options: AppOptions;
-        public sheets: Util.DualSparseArray<Sheet>;
-        
-        public constructor() {
-            this.sheets = new Util.DualSparseArray<Sheet>(() => new Sheet());
-        }
+    public constructor() {
+        this.sheets = new Util_Arrays.DualSparseArray<Sheet>(() => new Sheet());
     }
+}
+
+
+export class Sheet {
+    public columns: Util_Arrays.DualSparseArray<Column>;
     
-    export class Sheet {
-        public columns: Util.DualSparseArray<Column>;
-        
-        public constructor() {
-            this.columns = new Util.DualSparseArray<Column>(() => new Column());
-        }
+    public constructor() {
+        this.columns = new Util_Arrays.DualSparseArray<Column>(() => new Column());
     }
+}
+
+
+export class Column {
+    public cells: Util_Arrays.DualSparseArray<Cell>;
     
-    export class Column {
-        public cells: Util.DualSparseArray<Cell>;
-        
-        public constructor() {
-            this.cells = new Util.DualSparseArray<Cell>(() => new Cell());
-        }
+    public constructor() {
+        this.cells = new Util_Arrays.DualSparseArray<Cell>(() => new Cell());
     }
-    
-    export class Cell {
-        public formula: () => any;
-        public value: any;
-    }
-    
-    export class AppOptions {
-        // TODO:
-    }
+}
+
+
+export class Cell {
+    public formula: () => any;
+    public value: any;
+}
+
+
+export class AppOptions {
+    // TODO:
 }

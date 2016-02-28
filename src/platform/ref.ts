@@ -23,34 +23,32 @@ SOFTWARE.
 */
 
 
-namespace CalcJS {
-    export class CellRef {
-        public constructor(columnRef: RefUnit, rowRef: RefUnit, sheetRef?: RefUnit) {
-            this.columnRef = columnRef;
-            this.rowRef = rowRef;
-            this.sheetRef = sheetRef;
-        }
-        
-        public columnRef: RefUnit;
-        public rowRef: RefUnit;
-        public sheetRef: RefUnit;
+export class CellRef {
+    public constructor(columnRef: RefUnit, rowRef: RefUnit, sheetRef?: RefUnit) {
+        this.columnRef = columnRef;
+        this.rowRef = rowRef;
+        this.sheetRef = sheetRef;
     }
     
-    
-    export class RefUnit {
-        public constructor (kind: RefKind, value: RefValue) {
-            this.kind = kind;
-            this.value = value;
-        }
-        
-        public kind: RefKind;
-        public value: RefValue;
+    public columnRef: RefUnit;
+    public rowRef: RefUnit;
+    public sheetRef: RefUnit;
+}
+
+
+export class RefUnit {
+    public constructor (kind: RefKind, value: RefValue) {
+        this.kind = kind;
+        this.value = value;
     }
     
-    export type RefValue = number;
-    
-    export const enum RefKind {
-        ById = 0,
-        ByIndex = 1,
-    }
+    public kind: RefKind;
+    public value: RefValue;
+}
+
+export type RefValue = number;
+
+export const enum RefKind {
+    ById = 0,
+    ByIndex = 1,
 }

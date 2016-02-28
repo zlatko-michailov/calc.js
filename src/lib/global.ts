@@ -23,36 +23,35 @@ SOFTWARE.
 */
 
 
-/// <reference path="../platform/ref.ts" />
-/// <reference path="../platform/app.ts" />
+import * as Platform_Ref from "../platform/ref";
 
 
-export function cr(columnIndex: CalcJS.RefValue, rowIndex: CalcJS.RefValue, sheetIndex?: CalcJS.RefValue) : CalcJS.CellRef {
-    return new CalcJS.CellRef(
-                new CalcJS.RefUnit(CalcJS.RefKind.ById, columnIndex), 
-                new CalcJS.RefUnit(CalcJS.RefKind.ById, rowIndex), 
-                new CalcJS.RefUnit(CalcJS.RefKind.ById, sheetIndex));
+export function cr(columnIndex: Platform_Ref.RefValue, rowIndex: Platform_Ref.RefValue, sheetIndex?: Platform_Ref.RefValue) : Platform_Ref.CellRef {
+    return new Platform_Ref.CellRef(
+                new Platform_Ref.RefUnit(Platform_Ref.RefKind.ById, columnIndex), 
+                new Platform_Ref.RefUnit(Platform_Ref.RefKind.ById, rowIndex), 
+                new Platform_Ref.RefUnit(Platform_Ref.RefKind.ById, sheetIndex));
 }
 
-export function c$r(columnIndex: CalcJS.RefValue, rowIndex: CalcJS.RefValue, sheetIndex?: CalcJS.RefValue) : CalcJS.CellRef {
-    return new CalcJS.CellRef(
-                new CalcJS.RefUnit(CalcJS.RefKind.ByIndex, columnIndex), 
-                new CalcJS.RefUnit(CalcJS.RefKind.ById, rowIndex), 
-                new CalcJS.RefUnit(CalcJS.RefKind.ById, sheetIndex));
+export function c$r(columnIndex: Platform_Ref.RefValue, rowIndex: Platform_Ref.RefValue, sheetIndex?: Platform_Ref.RefValue) : Platform_Ref.CellRef {
+    return new Platform_Ref.CellRef(
+                new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndex, columnIndex), 
+                new Platform_Ref.RefUnit(Platform_Ref.RefKind.ById, rowIndex), 
+                new Platform_Ref.RefUnit(Platform_Ref.RefKind.ById, sheetIndex));
 }
 
-export function cr$(columnIndex: CalcJS.RefValue, rowIndex: CalcJS.RefValue, sheetIndex?: CalcJS.RefValue) : CalcJS.CellRef {
-    return new CalcJS.CellRef(
-                new CalcJS.RefUnit(CalcJS.RefKind.ById, columnIndex), 
-                new CalcJS.RefUnit(CalcJS.RefKind.ByIndex, rowIndex), 
-                new CalcJS.RefUnit(CalcJS.RefKind.ById, sheetIndex));
+export function cr$(columnIndex: Platform_Ref.RefValue, rowIndex: Platform_Ref.RefValue, sheetIndex?: Platform_Ref.RefValue) : Platform_Ref.CellRef {
+    return new Platform_Ref.CellRef(
+                new Platform_Ref.RefUnit(Platform_Ref.RefKind.ById, columnIndex), 
+                new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndex, rowIndex), 
+                new Platform_Ref.RefUnit(Platform_Ref.RefKind.ById, sheetIndex));
 }
 
-export function c$r$(columnIndex: CalcJS.RefValue, rowIndex: CalcJS.RefValue, sheetIndex?: CalcJS.RefValue) : CalcJS.CellRef {
-    return new CalcJS.CellRef(
-                new CalcJS.RefUnit(CalcJS.RefKind.ByIndex, columnIndex), 
-                new CalcJS.RefUnit(CalcJS.RefKind.ByIndex, rowIndex), 
-                new CalcJS.RefUnit(CalcJS.RefKind.ById, sheetIndex));
+export function c$r$(columnIndex: Platform_Ref.RefValue, rowIndex: Platform_Ref.RefValue, sheetIndex?: Platform_Ref.RefValue) : Platform_Ref.CellRef {
+    return new Platform_Ref.CellRef(
+                new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndex, columnIndex), 
+                new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndex, rowIndex), 
+                new Platform_Ref.RefUnit(Platform_Ref.RefKind.ById, sheetIndex));
 }
 
 

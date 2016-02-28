@@ -23,17 +23,16 @@ SOFTWARE.
 */
 
 
-import * as Arrays from "../util/arrays";
-
-import * as TestArrays from "./util/arrays";
+import * as Test_Util_Arrays from "./util/arrays";
 
 
 export class Framework {
     public static run(): void {
         let passed: boolean = true;
         
-        passed = this.execute("util/arrays/Stack", TestArrays.TestArrays.testStack) && passed;
-        passed = this.execute("util/arrays/SparseArray", this.testSparseArray) && passed;
+        passed = this.execute("util/arrays/Stack", Test_Util_Arrays.Tests.testStack) && passed;
+        passed = this.execute("util/arrays/SparseArray", Test_Util_Arrays.Tests.testSparseArray) && passed;
+        passed = this.execute("util/arrays/DualSparseArray", Test_Util_Arrays.Tests.testDualSparseArray) && passed;
         
         this.log(LogLevel.Important);
         this.log(LogLevel.Important, "=================");
@@ -74,35 +73,6 @@ export class Framework {
         this.log(LogLevel.Important, passed ? "PASSED" : "+++ FAILED +++" );
         
         return passed;
-    }
-    
-    private static testStack(): boolean {
-        let stack: Arrays.Stack<number> = new Arrays.Stack<number>();
-        let passed: boolean = true;
-        
-        stack.push(42);
-        stack.push(2016);
-        stack.push(26);
-        passed = Framework.areEqual(26, stack.pop(), LogLevel.Info, "pop") && passed;
-        stack.push(2);
-        stack.push(23);
-        passed = Framework.areEqual(23, stack.pop(), LogLevel.Info, "pop") && passed;
-        passed = Framework.areEqual(2, stack.pop(), LogLevel.Info, "pop") && passed;
-        passed = Framework.areEqual(2016, stack.pop(), LogLevel.Info, "pop") && passed;
-        passed = Framework.areEqual(42, stack.pop(), LogLevel.Info, "pop") && passed;
-        passed = Framework.areEqual(0, stack.length, LogLevel.Info, "empty") && passed;
-        
-        return passed;
-    }
-    
-    private static testSparseArray(): boolean {
-        Framework.log(LogLevel.Info, "one"); 
-        Framework.log(LogLevel.Detail, "two"); 
-        Framework.log(LogLevel.Verbose, "three"); 
-        Framework.log(LogLevel.Detail, "four"); 
-        Framework.log(LogLevel.Info, "five"); 
-        
-        return true;
     }
 }
 
