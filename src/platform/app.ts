@@ -42,7 +42,7 @@ export class App {
     public sheets: Util_Arrays.DualSparseArray<Sheet>;
     
     public constructor() {
-        this.sheets = new Util_Arrays.DualSparseArray<Sheet>(() => new Sheet());
+        this.sheets = new Util_Arrays.DualSparseArray<Sheet>();
     }
 }
 
@@ -51,7 +51,7 @@ export class Sheet {
     public columns: Util_Arrays.DualSparseArray<Column>;
     
     public constructor() {
-        this.columns = new Util_Arrays.DualSparseArray<Column>(() => new Column());
+        this.columns = new Util_Arrays.DualSparseArray<Column>();
     }
 }
 
@@ -60,7 +60,7 @@ export class Column {
     public cells: Util_Arrays.DualSparseArray<Cell>;
     
     public constructor() {
-        this.cells = new Util_Arrays.DualSparseArray<Cell>(() => new Cell());
+        this.cells = new Util_Arrays.DualSparseArray<Cell>();
     }
 }
 

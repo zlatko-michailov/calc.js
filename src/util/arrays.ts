@@ -40,31 +40,59 @@ export class SparseArray<T> {
 
 
 export class DualSparseArray<T> {
+    private count: number;
     private nextId: number;
-    private elementConstructor: () => T;
-    private byId: SparseArray<T>;
-    private byIndex: SparseArray<T>;
+    private byId: SparseArray<Link<T>> = new SparseArray<Link<T>>();
+    private byIndex: SparseArray<Link<T>> = new SparseArray<Link<T>>();
     
-    public constructor(elementConstructor: () => T) {
-        this.elementConstructor = elementConstructor;
+    public insert(index: number, count?: number) : void {
+        if (count == undefined) {
+            count = 1;
+        }
+        
+        for (let i: number = this.count - 1; index <= i; i--) {
+            this.byIndex[i + count] = this.byIndex[i]; 
+        }
+        
+        for (let i: number = 0; i < count; i++) {
+            let value: T = undefined;
+            this.byId[++this.nextId] = { link: index + i, value: value };
+            this.byIndex[index + i] = { link: this.nextId, value: value };
+        }
+        
+        this.count += count; 
     }
     
-    public getElementById(id: number) : T {
-        // TODO:
-        return undefined;
+    public delete(index: number, count?: number) : void {
+        if (count == undefined) {
+            count = 1;
+        }
+
+        for (let i: number = 0; i < count; i++) {
+            let id: number = this.byIndex[index + i].link; 
+            delete this.byId[id];
+            delete this.byIndex[index + i];
+        }
+
+        for (let i: number = index; i < this.count; i++) {
+            this.byIndex[i + count] = this.byIndex[i]; 
+        }
+        
+        this.count -= count; 
     }
     
-    public setElementById(id: number, value: T) : void {
-        // TODO:
+    public getById(id: number) : T {
+        return this.byId[id].value;
     }
     
-    public getElementByIndex(index: number) : T {
-        // TODO:
-        return undefined;
+    public getByIndex(index: number) : T {
+        return this.byIndex[index].value;
     }
-    
-    public setElementByIndex(index: number, value: T) : void {
-        // TODO:
-    }
+}
+
+
+class Link<T> {
+    public link: number;
+    public value: T;
 }
 
