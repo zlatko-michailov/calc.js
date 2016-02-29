@@ -65,6 +65,16 @@ export class Framework {
         return passed;
     }
     
+    public static isUndefined(actual: any, logLevel: string, message: string) : boolean {
+        let passed = undefined == actual;
+        if (!passed) {
+            logLevel = LogLevel.Important;
+        }
+        
+        Framework.log(logLevel, message, { actual: actual});
+        return passed;
+    }
+    
     private static execute(testName: string, testMethod: () => boolean): boolean {
         this.log(LogLevel.Important);
         this.log(LogLevel.Important, testName);

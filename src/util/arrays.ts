@@ -24,10 +24,20 @@ SOFTWARE.
 
 
 export class Stack<T> extends Array<T> {
-    public peek(): T {
-        return this.length > 0 ? this[this.length - 1] : undefined;
+    public peek(i?: number): T {
+        if (!i) {
+            i = 0;
+        }
+        
+        return this.length > 0 ? this[this.length - 1 - i] : undefined;
     }
 }
+
+
+export class SparseArray<T> {
+    [index: number]: T;
+}
+
 
 export class DualSparseArray<T> {
     private nextId: number;
@@ -58,24 +68,3 @@ export class DualSparseArray<T> {
     }
 }
 
-
-export class SparseArray<T> {
-    private elementConstructor: () => T;
-    [index: number]: T;
-    
-    public constructor(elementConstructor: () => T) {
-        this.elementConstructor = elementConstructor;
-    }
-    
-    public getElementAt(index: number) : T {
-        if (!this[index]) {
-            this[index] = this.elementConstructor();
-        }
-        
-        return this[index];
-    }
-    
-    public setElementAt(index: number, value: T) : void {
-        this[index] = value;
-    }
-}

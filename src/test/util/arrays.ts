@@ -34,8 +34,12 @@ export class Tests {
         
         stack.push(42);
         stack.push(2016);
+        passed = Test_Main.Framework.areEqual(42, stack.peek(1), Test_Main.LogLevel.Info, "peek(1)") && passed;
+        passed = Test_Main.Framework.areEqual(2016, stack.peek(), Test_Main.LogLevel.Info, "peek") && passed;
+        
         stack.push(26);
         passed = Test_Main.Framework.areEqual(26, stack.pop(), Test_Main.LogLevel.Info, "pop") && passed;
+        
         stack.push(2);
         stack.push(23);
         passed = Test_Main.Framework.areEqual(23, stack.pop(), Test_Main.LogLevel.Info, "pop") && passed;
@@ -48,13 +52,21 @@ export class Tests {
     }
     
     public static testSparseArray(): boolean {
-        Test_Main.Framework.log(Test_Main.LogLevel.Info, "one"); 
-        Test_Main.Framework.log(Test_Main.LogLevel.Detail, "two"); 
-        Test_Main.Framework.log(Test_Main.LogLevel.Verbose, "three"); 
-        Test_Main.Framework.log(Test_Main.LogLevel.Detail, "four"); 
-        Test_Main.Framework.log(Test_Main.LogLevel.Info, "five"); 
+        let array: Util_Arrays.SparseArray<number> = new Util_Arrays.SparseArray<number>();
+        let passed: boolean = true;
         
-        return false;
+        passed = Test_Main.Framework.isUndefined(array[99], Test_Main.LogLevel.Info, "unsset") && passed;
+        
+        array[2016] = 1234;
+        passed = Test_Main.Framework.areEqual(1234, array[2016], Test_Main.LogLevel.Info, "get set") && passed;
+        
+        delete array[99];
+        passed = Test_Main.Framework.isUndefined(array[99], Test_Main.LogLevel.Info, "deleted") && passed;
+        for (let index in array) {
+           passed = Test_Main.Framework.areEqual('2016', index, Test_Main.LogLevel.Info, "for") && passed;
+        }
+        
+        return passed;
     }
 
     public static testDualSparseArray(): boolean {
