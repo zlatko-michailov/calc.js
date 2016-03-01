@@ -56,8 +56,9 @@ export class DualSparseArray<T> {
         
         for (let i: number = 0; i < count; i++) {
             let value: T = undefined;
-            this.byId[++this.nextId] = { link: index + i, value: value };
+            this.byId[this.nextId] = { link: index + i, value: value };
             this.byIndex[index + i] = { link: this.nextId, value: value };
+            this.nextId++;
         }
         
         this.count += count; 
@@ -82,11 +83,21 @@ export class DualSparseArray<T> {
     }
     
     public getById(id: number) : T {
-        return this.byId[id].value;
+        let link: Link<T> = this.byId[id];
+        return link ? link.value : undefined;
+    }
+    
+    public setById(id: number, value: T) : void {
+        this.byId[id].value = value;
     }
     
     public getByIndex(index: number) : T {
-        return this.byIndex[index].value;
+        let link: Link<T> = this.byIndex[index];
+        return link ? link.value : undefined;
+    }
+
+    public setByIndex(index: number, value: T) : void {
+        this.byIndex[index].value = value;
     }
 }
 

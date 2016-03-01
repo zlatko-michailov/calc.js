@@ -57,21 +57,17 @@ export class Framework {
     
     public static areEqual<T>(expected: T, actual: T, logLevel: string, message: string) : boolean {
         let passed = expected == actual;
-        if (!passed) {
-            logLevel = LogLevel.Important;
-        }
+        let text = (passed ? "P" : "F") + ": " + message;
         
-        Framework.log(logLevel, message, { expected: expected, actual: actual});
+        Framework.log(logLevel, text, { expected: expected, actual: actual });
         return passed;
     }
     
     public static isUndefined(actual: any, logLevel: string, message: string) : boolean {
         let passed = undefined == actual;
-        if (!passed) {
-            logLevel = LogLevel.Important;
-        }
+        let text = (passed ? "P" : "F") + ": " + message;
         
-        Framework.log(logLevel, message, { actual: actual});
+        Framework.log(logLevel, text, { actual: actual });
         return passed;
     }
     
