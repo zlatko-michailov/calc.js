@@ -120,6 +120,27 @@ export class Tests {
         passed = Test_Main.Framework.isUndefined(array.getById(4), Test_Main.LogLevel.Info, "by id(4)") && passed;
         passed = Test_Main.Framework.areEqual(24, array.getById(5), Test_Main.LogLevel.Info, "by id(5)") && passed;
         
+        // [11, 21, 24, 12, 31, 32 ]
+        array.insert(4, 2);
+        array.setById(6, 31);
+        array.setById(7, 32);
+        
+        passed = Test_Main.Framework.areEqual(11, array.getByIndex(0), Test_Main.LogLevel.Info, "by index(0)") && passed;
+        passed = Test_Main.Framework.areEqual(21, array.getByIndex(1), Test_Main.LogLevel.Info, "by index(1)") && passed;
+        passed = Test_Main.Framework.areEqual(24, array.getByIndex(2), Test_Main.LogLevel.Info, "by index(2)") && passed;
+        passed = Test_Main.Framework.areEqual(12, array.getByIndex(3), Test_Main.LogLevel.Info, "by index(3)") && passed;
+        passed = Test_Main.Framework.areEqual(31, array.getByIndex(4), Test_Main.LogLevel.Info, "by index(4)") && passed;
+        passed = Test_Main.Framework.areEqual(32, array.getByIndex(5), Test_Main.LogLevel.Info, "by index(5)") && passed;
+
+        passed = Test_Main.Framework.areEqual(11, array.getById(0), Test_Main.LogLevel.Info, "by id(0)") && passed;
+        passed = Test_Main.Framework.areEqual(12, array.getById(1), Test_Main.LogLevel.Info, "by id(1)") && passed;
+        passed = Test_Main.Framework.areEqual(21, array.getById(2), Test_Main.LogLevel.Info, "by id(2)") && passed;
+        passed = Test_Main.Framework.isUndefined(array.getById(3), Test_Main.LogLevel.Info, "by id(3)") && passed;
+        passed = Test_Main.Framework.isUndefined(array.getById(4), Test_Main.LogLevel.Info, "by id(4)") && passed;
+        passed = Test_Main.Framework.areEqual(24, array.getById(5), Test_Main.LogLevel.Info, "by id(5)") && passed;
+        passed = Test_Main.Framework.areEqual(31, array.getById(6), Test_Main.LogLevel.Info, "by id(6)") && passed;
+        passed = Test_Main.Framework.areEqual(32, array.getById(7), Test_Main.LogLevel.Info, "by id(7)") && passed;
+        
         return passed;
     }
 }

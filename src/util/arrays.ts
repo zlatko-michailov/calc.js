@@ -46,55 +46,57 @@ export class DualSparseArray<T> {
     private byIndex: number[] = [];
     
     public insert(index: number, count?: number) : void {
+        if (index < 0) {
+            index = 0;
+        }
+        
         if (count == undefined) {
             count = 1;
         }
         
-        this.count += count;
-        
-        // Append blank elements at the end 
-        /*for (let i: number = 0; i < count; i++) {
-            this.byIndex.push(undefined);
-        }*/
-
         // Shift the elements to open a gap.        
         for (let i: number = this.count - 1; index <= i; i--) {
-            this.byIndex[i] = this.byIndex[i - count];
+            this.byIndex[i + count] = this.byIndex[i];
+            
             let id: number = this.byIndex[i];
-            if (id != undefined) {
-                this.byId[id].index += count 
-            }
+            this.byId[id].index += count 
         }
         
         // Init the elements in the gap.
-        for (let i: number = 0; i < count; i++) {
-            this.byId[this.nextId] = { index: index + i, value: undefined };
-            this.byIndex[index + i] = this.nextId;
+        for (let i: number = index; i < index + count; i++) {
+            this.byId[this.nextId] = { index: i, value: undefined };
+            this.byIndex[i] = this.nextId;
             this.nextId++;
         }
+
+        this.count += count;
     }
     
     public delete(index: number, count?: number) : void {
+        if (index < 0) {
+            index = 0;
+        }
+        
         if (count == undefined) {
             count = 1;
         }
         
-        this.count -= count; 
-
         // Delete elements. Open a gap.
-        for (let i: number = 0; i < count; i++) {
-            let id: number = this.byIndex[index + i]; 
+        for (let i: number = index; i < index + count; i++) {
+            let id: number = this.byIndex[i]; 
             delete this.byId[id];
-            delete this.byIndex[index + i];
+            delete this.byIndex[i];
         }
 
         // Shift back the elements to close the gap.
-        for (let i: number = index; i < this.count; i++) {
+        for (let i: number = index; i < this.count - count; i++) {
             this.byIndex[i] = this.byIndex[i + count]; 
         }
         
         // Trim the elements at the end.
         this.byIndex.splice(this.count, count);
+
+        this.count -= count; 
     }
     
     public getById(id: number) : T {
