@@ -42,49 +42,62 @@ export class SparseArray<T> {
 export class DualSparseArray<T> {
     private count: number;
     private nextId: number;
-    private byId: SparseArray<Link<T>> = new SparseArray<Link<T>>();
-    private byIndex: SparseArray<Link<T>> = new SparseArray<Link<T>>();
+    private byId: SparseArray<IndexValue<T>> = new SparseArray<IndexValue<T>>();
+    private byIndex: number[] = [];
     
     public insert(index: number, count?: number) : void {
-        if (count == undefined) {
+        if (!count == undefined) {
             count = 1;
         }
         
+        this.count += count;
+        
+        // Append blank elements at the end 
+        for (let i: number = 0; i < count; i++) {
+            this.byIndex.push(undefined);
+        }
+
+        // Shift the elements to open a gap.        
         for (let i: number = this.count - 1; index <= i; i--) {
-            this.byIndex[i + count] = this.byIndex[i]; 
+            let id: number = this.byIndex[i];
+            this.byIndex[i + count] = this.byIndex[i];
+            this.byId[id].index += count 
         }
         
+        // Init the elements in the gap.
         for (let i: number = 0; i < count; i++) {
-            let value: T = undefined;
-            this.byId[this.nextId] = { link: index + i, value: value };
-            this.byIndex[index + i] = { link: this.nextId, value: value };
+            this.byId[this.nextId] = { index: index + i, value: undefined };
+            this.byIndex[index + i] = this.nextId;
             this.nextId++;
         }
-        
-        this.count += count; 
     }
     
     public delete(index: number, count?: number) : void {
         if (count == undefined) {
             count = 1;
         }
+        
+        this.count -= count; 
 
+        // Delete elements. Open a gap.
         for (let i: number = 0; i < count; i++) {
-            let id: number = this.byIndex[index + i].link; 
+            let id: number = this.byIndex[index + i]; 
             delete this.byId[id];
             delete this.byIndex[index + i];
         }
 
+        // Shift back the elements to close the gap.
         for (let i: number = index; i < this.count; i++) {
-            this.byIndex[i + count] = this.byIndex[i]; 
+            this.byIndex[i] = this.byIndex[i + count]; 
         }
         
-        this.count -= count; 
+        // Trim the elements at the end.
+        this.byIndex.splice(this.count, count);
     }
     
     public getById(id: number) : T {
-        let link: Link<T> = this.byId[id];
-        return link ? link.value : undefined;
+        let indexValue: IndexValue<T> = this.byId[id];
+        return indexValue ? indexValue.value : undefined;
     }
     
     public setById(id: number, value: T) : void {
@@ -92,18 +105,27 @@ export class DualSparseArray<T> {
     }
     
     public getByIndex(index: number) : T {
-        let link: Link<T> = this.byIndex[index];
-        return link ? link.value : undefined;
+        let id: number = this.byIndex[index];
+        return this.byId[id].value;
     }
 
     public setByIndex(index: number, value: T) : void {
-        this.byIndex[index].value = value;
+        let id: number = this.byIndex[index];
+        this.byId[id].value = value;
+    }
+
+    public getId(index: number) : number {
+        return this.byIndex[index];
+    }
+    
+    public getIndex(id: number) : number {
+        return this.byId[id].index;
     }
 }
 
 
-class Link<T> {
-    public link: number;
+class IndexValue<T> {
+    public index: number;
     public value: T;
 }
 
