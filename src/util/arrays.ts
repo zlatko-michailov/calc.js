@@ -40,28 +40,30 @@ export class SparseArray<T> {
 
 
 export class DualSparseArray<T> {
-    private count: number;
-    private nextId: number;
+    private count: number = 0;
+    private nextId: number = 0;
     private byId: SparseArray<IndexValue<T>> = new SparseArray<IndexValue<T>>();
     private byIndex: number[] = [];
     
     public insert(index: number, count?: number) : void {
-        if (!count == undefined) {
+        if (count == undefined) {
             count = 1;
         }
         
         this.count += count;
         
         // Append blank elements at the end 
-        for (let i: number = 0; i < count; i++) {
+        /*for (let i: number = 0; i < count; i++) {
             this.byIndex.push(undefined);
-        }
+        }*/
 
         // Shift the elements to open a gap.        
         for (let i: number = this.count - 1; index <= i; i--) {
+            this.byIndex[i] = this.byIndex[i - count];
             let id: number = this.byIndex[i];
-            this.byIndex[i + count] = this.byIndex[i];
-            this.byId[id].index += count 
+            if (id != undefined) {
+                this.byId[id].index += count 
+            }
         }
         
         // Init the elements in the gap.

@@ -77,8 +77,10 @@ export class Tests {
         array.insert(0, 2);
         array.setByIndex(0, 11);
         array.setByIndex(1, 12);
+        
         passed = Test_Main.Framework.areEqual(11, array.getByIndex(0), Test_Main.LogLevel.Info, "by index(0)") && passed;
-        passed = Test_Main.Framework.areEqual(21, array.getByIndex(1), Test_Main.LogLevel.Info, "by index(1)") && passed;
+        passed = Test_Main.Framework.areEqual(12, array.getByIndex(1), Test_Main.LogLevel.Info, "by index(1)") && passed;
+        
         passed = Test_Main.Framework.areEqual(11, array.getById(0), Test_Main.LogLevel.Info, "by id(0)") && passed;
         passed = Test_Main.Framework.areEqual(12, array.getById(1), Test_Main.LogLevel.Info, "by id(1)") && passed;
 
@@ -89,8 +91,23 @@ export class Tests {
         array.setByIndex(3, 23);
         array.setByIndex(4, 24);
         
+        passed = Test_Main.Framework.areEqual(11, array.getByIndex(0), Test_Main.LogLevel.Info, "by index(0)") && passed;
+        passed = Test_Main.Framework.areEqual(21, array.getByIndex(1), Test_Main.LogLevel.Info, "by index(1)") && passed;
+        passed = Test_Main.Framework.areEqual(22, array.getByIndex(2), Test_Main.LogLevel.Info, "by index(2)") && passed;
+        passed = Test_Main.Framework.areEqual(23, array.getByIndex(3), Test_Main.LogLevel.Info, "by index(3)") && passed;
+        passed = Test_Main.Framework.areEqual(24, array.getByIndex(4), Test_Main.LogLevel.Info, "by index(4)") && passed;
+        passed = Test_Main.Framework.areEqual(12, array.getByIndex(5), Test_Main.LogLevel.Info, "by index(5)") && passed;
+        
+        passed = Test_Main.Framework.areEqual(11, array.getById(0), Test_Main.LogLevel.Info, "by id(0)") && passed;
+        passed = Test_Main.Framework.areEqual(12, array.getById(1), Test_Main.LogLevel.Info, "by id(1)") && passed;
+        passed = Test_Main.Framework.areEqual(21, array.getById(2), Test_Main.LogLevel.Info, "by id(2)") && passed;
+        passed = Test_Main.Framework.areEqual(22, array.getById(3), Test_Main.LogLevel.Info, "by id(3)") && passed;
+        passed = Test_Main.Framework.areEqual(23, array.getById(4), Test_Main.LogLevel.Info, "by id(4)") && passed;
+        passed = Test_Main.Framework.areEqual(24, array.getById(5), Test_Main.LogLevel.Info, "by id(5)") && passed;
+        
         // [11, 21, 24, 12 ]
         array.delete(2, 2);
+        
         passed = Test_Main.Framework.areEqual(11, array.getByIndex(0), Test_Main.LogLevel.Info, "by index(0)") && passed;
         passed = Test_Main.Framework.areEqual(21, array.getByIndex(1), Test_Main.LogLevel.Info, "by index(1)") && passed;
         passed = Test_Main.Framework.areEqual(24, array.getByIndex(2), Test_Main.LogLevel.Info, "by index(2)") && passed;
