@@ -24,6 +24,7 @@ SOFTWARE.
 
 
 import * as Test_Util_Arrays from "./util/arrays";
+import * as Test_Util_JSON from "./util/json";
 
 
 export class Framework {
@@ -33,6 +34,7 @@ export class Framework {
         passed = this.execute("util/arrays/Stack", Test_Util_Arrays.Tests.testStack) && passed;
         passed = this.execute("util/arrays/SparseArray", Test_Util_Arrays.Tests.testSparseArray) && passed;
         passed = this.execute("util/arrays/DualSparseArray", Test_Util_Arrays.Tests.testDualSparseArray) && passed;
+        passed = this.execute("util/json/Serializer", Test_Util_JSON.Tests.testSerializer) && passed;
         
         this.log(LogLevel.Important);
         this.log(LogLevel.Important, "=================");
