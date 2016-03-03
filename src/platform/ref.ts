@@ -37,16 +37,14 @@ export class CellRef {
 
 
 export class RefUnit {
-    public constructor (kind: RefKind, value: RefValue) {
+    public constructor (kind: RefKind, value: number) {
         this.kind = kind;
         this.value = value;
     }
     
     public kind: RefKind;
-    public value: RefValue;
+    public value: number;
 }
-
-export type RefValue = number;
 
 export const enum RefKind {
     ById = 0,

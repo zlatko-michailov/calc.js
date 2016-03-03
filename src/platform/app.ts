@@ -23,21 +23,12 @@ SOFTWARE.
 */
 
 
-/// <reference path="../util/arrays.ts" />
-/// <reference path="ref.ts" />
-
 import * as Platform_Ref from "./ref";
 import * as Util_Arrays from "../util/arrays";
 
 
-export class AppSession {
-    private app: App;
-    private contextCellStack: Util_Arrays.Stack<Platform_Ref.CellRef>;
-    private calcRunId: number;
-}
-
-
 export class App {
+    private sessionState: AppSessionState; 
     public options: AppOptions;
     public sheets: Util_Arrays.DualSparseArray<Sheet>;
     
@@ -74,3 +65,11 @@ export class Cell {
 export class AppOptions {
     // TODO:
 }
+
+
+class AppSessionState {
+    public contextCellStack: Util_Arrays.Stack<Platform_Ref.CellRef>;
+    public calcRunId: number;
+}
+
+
