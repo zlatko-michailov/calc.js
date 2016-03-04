@@ -37,8 +37,9 @@ export class Framework {
         passed = this.execute("util/json/Serializer", Test_Util_JSON.Tests.testSerializer) && passed;
         
         this.log(LogLevel.Important);
-        this.log(LogLevel.Important, "=================");
-        this.log(LogLevel.Important, passed ? "[Passed]" : "[+++ FAILED +++]" );
+        this.log(LogLevel.Important, "==============");
+        this.log(LogLevel.Important, passed ? "    PASSED" : "+++ FAILED +++" );
+        this.log(LogLevel.Important, "==============");
     }
     
     public static log(level: string, message?: string, ...args: any[]): void {

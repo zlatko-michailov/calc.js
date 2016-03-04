@@ -28,28 +28,55 @@ import * as Util_Arrays from "../util/arrays";
 
 
 export class App {
-    public sessionState: AppSessionState = new AppSessionState(); 
-    public options: AppOptions = new AppOptions();
-    public sheets: Util_Arrays.DualSparseArray<Sheet> = new Util_Arrays.DualSparseArray<Sheet>();
+    private sessionState: AppSessionState = new AppSessionState(); 
+    private options: AppOptions = new AppOptions();
+    private sheets: Util_Arrays.DualSparseArray<Sheet> = new Util_Arrays.DualSparseArray<Sheet>();
     
+    public getOptions() : AppOptions {
+        return this.options;
+    }
+    
+    public getSheets() : Util_Arrays.DualSparseArray<Sheet> {
+        return this.sheets;
+    }
+    
+    public setCurrentSheet(sheetRef: Platform_Ref.RefUnit) : void {
+        this.sessionState.currentSheetId = sheetRef.kind == Platform_Ref.RefKind.ByIndex ? this.sheets.getId(sheetRef.value) : sheetRef.value;
+    }
+    
+    public getCellValue(cellRef: Platform_Ref.CellRef) : any {
+        
+    }
+    
+    public parseCellInput(cellRef: Platform_Ref.CellRef, input?: string) : void {
+        
+    }
 }
 
 
 export class Sheet {
-    public columns: Util_Arrays.DualSparseArray<Column> = new Util_Arrays.DualSparseArray<Column>();
+    private columns: Util_Arrays.DualSparseArray<Column> = new Util_Arrays.DualSparseArray<Column>();
+
+    public getColumns() : Util_Arrays.DualSparseArray<Column> {
+        return this.columns;
+    }
 }
 
 
 export class Column {
-    public cells: Util_Arrays.DualSparseArray<Cell> = new Util_Arrays.DualSparseArray<Cell>();
+    private cells: Util_Arrays.DualSparseArray<Cell> = new Util_Arrays.DualSparseArray<Cell>();
+
+    public getCells() : Util_Arrays.DualSparseArray<Cell> {
+        return this.cells;
+    }
 }
 
 
 export class Cell {
-    public sessionState: CellSessionState = new CellSessionState();
-    public input: string;
-    public formula: () => any;
-    public value: any;
+    private sessionState: CellSessionState = new CellSessionState();
+    private input: string;
+    private formula: () => any;
+    private value: any;
 }
 
 
@@ -60,9 +87,11 @@ export class AppOptions {
 
 
 class AppSessionState {
-    public contextCellStack: Util_Arrays.Stack<Platform_Ref.CellRef> = new Util_Arrays.Stack<Platform_Ref.CellRef>();
-    public calcRunId: number = 0;
+    public currentSheetId: number;
+    public currentCellStack: Util_Arrays.Stack<Platform_Ref.CellRef> = new Util_Arrays.Stack<Platform_Ref.CellRef>();
+    public currentCalcRunId: number = 0;
 }
+
 
 class CellSessionState {
 }

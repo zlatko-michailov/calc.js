@@ -46,8 +46,8 @@ export class DualSparseArray<T> {
     private byIndex: number[] = [];
     
     public insert(index: number, count?: number) : void {
-        if (index < 0) {
-            index = 0;
+        if (index < 0 || index > this.count) {
+            throw "Index out of range.";
         }
         
         if (count == undefined) {
@@ -73,8 +73,8 @@ export class DualSparseArray<T> {
     }
     
     public delete(index: number, count?: number) : void {
-        if (index < 0) {
-            index = 0;
+        if (index < 0 || index > this.count) {
+            throw "Index out of range.";
         }
         
         if (count == undefined) {
