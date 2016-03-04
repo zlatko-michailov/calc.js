@@ -28,48 +28,42 @@ import * as Util_Arrays from "../util/arrays";
 
 
 export class App {
-    private sessionState: AppSessionState; 
-    public options: AppOptions;
-    public sheets: Util_Arrays.DualSparseArray<Sheet>;
+    public sessionState: AppSessionState = new AppSessionState(); 
+    public options: AppOptions = new AppOptions();
+    public sheets: Util_Arrays.DualSparseArray<Sheet> = new Util_Arrays.DualSparseArray<Sheet>();
     
-    public constructor() {
-        this.sheets = new Util_Arrays.DualSparseArray<Sheet>();
-    }
 }
 
 
 export class Sheet {
-    public columns: Util_Arrays.DualSparseArray<Column>;
-    
-    public constructor() {
-        this.columns = new Util_Arrays.DualSparseArray<Column>();
-    }
+    public columns: Util_Arrays.DualSparseArray<Column> = new Util_Arrays.DualSparseArray<Column>();
 }
 
 
 export class Column {
-    public cells: Util_Arrays.DualSparseArray<Cell>;
-    
-    public constructor() {
-        this.cells = new Util_Arrays.DualSparseArray<Cell>();
-    }
+    public cells: Util_Arrays.DualSparseArray<Cell> = new Util_Arrays.DualSparseArray<Cell>();
 }
 
 
 export class Cell {
+    public sessionState: CellSessionState = new CellSessionState();
+    public input: string;
     public formula: () => any;
     public value: any;
 }
 
 
 export class AppOptions {
-    // TODO:
+    public allowGetFormulas: boolean = true;
+    public allowSetFormulas: boolean = true;
 }
 
 
 class AppSessionState {
-    public contextCellStack: Util_Arrays.Stack<Platform_Ref.CellRef>;
-    public calcRunId: number;
+    public contextCellStack: Util_Arrays.Stack<Platform_Ref.CellRef> = new Util_Arrays.Stack<Platform_Ref.CellRef>();
+    public calcRunId: number = 0;
 }
 
+class CellSessionState {
+}
 
