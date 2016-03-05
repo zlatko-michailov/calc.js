@@ -23,6 +23,9 @@ SOFTWARE.
 */
 
 
+import * as Util_Errors from "./errors";
+
+
 export class Stack<T> extends Array<T> {
     public peek(i?: number): T {
         if (!i) {
@@ -47,7 +50,7 @@ export class DualSparseArray<T> {
     
     public insert(index: number, count?: number) : void {
         if (index < 0 || index > this.count) {
-            throw "Index out of range.";
+            throw new Util_Errors.Exception(Util_Errors.ErrorCode.IndexOutOfRange);
         }
         
         if (count == undefined) {
@@ -74,7 +77,7 @@ export class DualSparseArray<T> {
     
     public delete(index: number, count?: number) : void {
         if (index < 0 || index > this.count) {
-            throw "Index out of range.";
+            throw new Util_Errors.Exception(Util_Errors.ErrorCode.IndexOutOfRange);
         }
         
         if (count == undefined) {

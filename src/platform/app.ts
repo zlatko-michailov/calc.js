@@ -25,31 +25,64 @@ SOFTWARE.
 
 import * as Platform_Ref from "./ref";
 import * as Util_Arrays from "../util/arrays";
+import * as Util_Errors from "../util/errors";
 
 
 export class App {
     private sessionState: AppSessionState = new AppSessionState(); 
-    private options: AppOptions = new AppOptions();
     private sheets: Util_Arrays.DualSparseArray<Sheet> = new Util_Arrays.DualSparseArray<Sheet>();
-    
-    public getOptions() : AppOptions {
-        return this.options;
-    }
+    private protectionPassword: string;
     
     public getSheets() : Util_Arrays.DualSparseArray<Sheet> {
         return this.sheets;
     }
     
-    public setCurrentSheet(sheetRef: Platform_Ref.RefUnit) : void {
-        this.sessionState.currentSheetId = sheetRef.kind == Platform_Ref.RefKind.ByIndex ? this.sheets.getId(sheetRef.value) : sheetRef.value;
-    }
-    
     public getCellValue(cellRef: Platform_Ref.CellRef) : any {
-        
+        this.usingCell(cellRef, this.getCurrentCellValue);
     }
     
     public parseCellInput(cellRef: Platform_Ref.CellRef, input?: string) : void {
+        this.usingCell(cellRef, this.parseCurrentCellInput, input)
+    }
+    
+    private usingCell(cellRef: Platform_Ref.CellRef, action: (arg1?: any) => any, arg1?: any) : void {
+        this.sessionState.currentCellStack.push(cellRef);
+        try {
+            return action(arg1);
+        }
+        finally {
+           this.sessionState.currentCellStack.pop(); 
+        }
+    }
+    
+    private getCurrentCellValue() : any {
+        // TODO
+    }
+    
+    public parseCurrentCellInput(input?: string) : void {
+        // TODO
+    }
+    
+    public isProtected() : boolean {
+        return this.protectionPassword != undefined;
+    }
+    
+    public setProtection(password: string) {
+        if (this.isProtected()) {
+            throw new Util_Errors.Exception(Util_Errors.ErrorCode.InvalidOperation, "This app is already protected. You must remove protection before setting it again.");
+        }
         
+        this.protectionPassword = password;
+    }
+    
+    public removeProtection(password: string) {
+        if (this.isProtected()) {
+            if (this.protectionPassword != password) {
+                throw new Util_Errors.Exception(Util_Errors.ErrorCode.InvalidArgument, "The provided protection password doesn't match the original.");
+            }
+            
+            this.protectionPassword = undefined;
+        }
     }
 }
 
@@ -80,14 +113,7 @@ export class Cell {
 }
 
 
-export class AppOptions {
-    public allowGetFormulas: boolean = true;
-    public allowSetFormulas: boolean = true;
-}
-
-
 class AppSessionState {
-    public currentSheetId: number;
     public currentCellStack: Util_Arrays.Stack<Platform_Ref.CellRef> = new Util_Arrays.Stack<Platform_Ref.CellRef>();
     public currentCalcRunId: number = 0;
 }
