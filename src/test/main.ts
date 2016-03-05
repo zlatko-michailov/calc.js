@@ -23,8 +23,10 @@ SOFTWARE.
 */
 
 
+import * as Util_Errors from "../util/errors";
 import * as Test_Util_Arrays from "./util/arrays";
 import * as Test_Util_JSON from "./util/json";
+import * as Test_Platform_App from "./platform/app";
 
 
 export class Framework {
@@ -35,6 +37,7 @@ export class Framework {
         passed = this.execute("util/arrays/SparseArray", Test_Util_Arrays.Tests.testSparseArray) && passed;
         passed = this.execute("util/arrays/DualSparseArray", Test_Util_Arrays.Tests.testDualSparseArray) && passed;
         passed = this.execute("util/json/Serializer", Test_Util_JSON.Tests.testSerializer) && passed;
+        passed = this.execute("platform/app/App/Protection", Test_Platform_App.Tests.testProtection) && passed;
         
         this.log(LogLevel.Important);
         this.log(LogLevel.Important, "==============");
@@ -71,6 +74,21 @@ export class Framework {
         let text = (passed ? "P" : "F") + ": " + message;
         
         Framework.log(logLevel, text, { actual: actual });
+        return passed;
+    }
+    
+    public static throws(expectedCode: Util_Errors.ErrorCode, action: () => any, logLevel: string, message: string) : boolean {
+        let passed = false;
+        
+        try {
+            action();
+            
+            Framework.log(logLevel, "F: " + message, { expected: expectedCode });
+        }
+        catch (ex) {
+            passed = Framework.areEqual(expectedCode, ex.code, logLevel, message);
+        }
+        
         return passed;
     }
     

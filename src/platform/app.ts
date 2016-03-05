@@ -110,6 +110,10 @@ export class Cell {
     private input: string;
     private formula: () => any;
     private value: any;
+    
+    public isUnderCalc() : boolean {
+        return false; // TODO:
+    }
 }
 
 
@@ -120,5 +124,6 @@ class AppSessionState {
 
 
 class CellSessionState {
+    public lastCalcRunId: number = 0;
 }
 
