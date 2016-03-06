@@ -28,7 +28,7 @@ import * as Test_Main from "../main";
 
 
 export class Tests {
-    public static testStack(): boolean {
+    static testStack(): boolean {
         let stack: Util_Arrays.Stack<number> = new Util_Arrays.Stack<number>();
         let passed: boolean = true;
         
@@ -51,7 +51,7 @@ export class Tests {
         return passed;
     }
     
-    public static testSparseArray(): boolean {
+    static testSparseArray(): boolean {
         let array: Util_Arrays.SparseArray<number> = new Util_Arrays.SparseArray<number>();
         let passed: boolean = true;
         
@@ -69,7 +69,7 @@ export class Tests {
         return passed;
     }
 
-    public static testDualSparseArray(): boolean {
+    static testDualSparseArray(): boolean {
         let array: Util_Arrays.DualSparseArray<number> = new Util_Arrays.DualSparseArray<number>();
         let passed: boolean = true;
 

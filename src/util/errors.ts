@@ -24,10 +24,10 @@ SOFTWARE.
 
 
 export class Exception {
-    public code: ErrorCode;
-    public message: string;
+    code: ErrorCode;
+    message: string;
     
-    public constructor(code: ErrorCode, message?: string) {
+    constructor(code: ErrorCode, message?: string) {
         this.code = code;
         this.message = message;
     }

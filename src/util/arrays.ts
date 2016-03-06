@@ -27,7 +27,7 @@ import * as Util_Errors from "./errors";
 
 
 export class Stack<T> extends Array<T> {
-    public peek(i?: number): T {
+    peek(i?: number): T {
         if (!i) {
             i = 0;
         }
@@ -43,13 +43,13 @@ export class SparseArray<T> {
 
 
 export class DualSparseArray<T> {
-    private count: number = 0;
-    private nextId: number = 0;
-    private byId: SparseArray<IndexValue<T>> = new SparseArray<IndexValue<T>>();
-    private byIndex: number[] = [];
+    _count: number = 0;
+    _nextId: number = 0;
+    _byId: SparseArray<IndexValue<T>> = new SparseArray<IndexValue<T>>();
+    _byIndex: number[] = [];
     
-    public insert(index: number, count?: number) : void {
-        if (index < 0 || index > this.count) {
+    insert(index: number, count?: number) : void {
+        if (index < 0 || index > this._count) {
             throw new Util_Errors.Exception(Util_Errors.ErrorCode.IndexOutOfRange);
         }
         
@@ -58,25 +58,25 @@ export class DualSparseArray<T> {
         }
         
         // Shift the elements to open a gap.        
-        for (let i: number = this.count - 1; index <= i; i--) {
-            this.byIndex[i + count] = this.byIndex[i];
+        for (let i: number = this._count - 1; index <= i; i--) {
+            this._byIndex[i + count] = this._byIndex[i];
             
-            let id: number = this.byIndex[i];
-            this.byId[id].index += count 
+            let id: number = this._byIndex[i];
+            this._byId[id].index += count 
         }
         
         // Init the elements in the gap.
         for (let i: number = index; i < index + count; i++) {
-            this.byId[this.nextId] = { index: i, value: undefined };
-            this.byIndex[i] = this.nextId;
-            this.nextId++;
+            this._byId[this._nextId] = { index: i, value: undefined };
+            this._byIndex[i] = this._nextId;
+            this._nextId++;
         }
 
-        this.count += count;
+        this._count += count;
     }
     
-    public delete(index: number, count?: number) : void {
-        if (index < 0 || index > this.count) {
+    delete(index: number, count?: number) : void {
+        if (index < 0 || index > this._count) {
             throw new Util_Errors.Exception(Util_Errors.ErrorCode.IndexOutOfRange);
         }
         
@@ -86,53 +86,53 @@ export class DualSparseArray<T> {
         
         // Delete elements. Open a gap.
         for (let i: number = index; i < index + count; i++) {
-            let id: number = this.byIndex[i]; 
-            delete this.byId[id];
-            delete this.byIndex[i];
+            let id: number = this._byIndex[i]; 
+            delete this._byId[id];
+            delete this._byIndex[i];
         }
 
         // Shift back the elements to close the gap.
-        for (let i: number = index; i < this.count - count; i++) {
-            this.byIndex[i] = this.byIndex[i + count]; 
+        for (let i: number = index; i < this._count - count; i++) {
+            this._byIndex[i] = this._byIndex[i + count]; 
         }
         
         // Trim the elements at the end.
-        this.byIndex.splice(this.count, count);
+        this._byIndex.splice(this._count, count);
 
-        this.count -= count; 
+        this._count -= count; 
     }
     
-    public getById(id: number) : T {
-        let indexValue: IndexValue<T> = this.byId[id];
+    getById(id: number) : T {
+        let indexValue: IndexValue<T> = this._byId[id];
         return indexValue ? indexValue.value : undefined;
     }
     
-    public setById(id: number, value: T) : void {
-        this.byId[id].value = value;
+    setById(id: number, value: T) : void {
+        this._byId[id].value = value;
     }
     
-    public getByIndex(index: number) : T {
-        let id: number = this.byIndex[index];
-        return this.byId[id].value;
+    getByIndex(index: number) : T {
+        let id: number = this._byIndex[index];
+        return this._byId[id].value;
     }
 
-    public setByIndex(index: number, value: T) : void {
-        let id: number = this.byIndex[index];
-        this.byId[id].value = value;
+    setByIndex(index: number, value: T) : void {
+        let id: number = this._byIndex[index];
+        this._byId[id].value = value;
     }
 
-    public getId(index: number) : number {
-        return this.byIndex[index];
+    getId(index: number) : number {
+        return this._byIndex[index];
     }
     
-    public getIndex(id: number) : number {
-        return this.byId[id].index;
+    getIndex(id: number) : number {
+        return this._byId[id].index;
     }
 }
 
 
 class IndexValue<T> {
-    public index: number;
-    public value: T;
+    index: number;
+    value: T;
 }
 

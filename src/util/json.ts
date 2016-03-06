@@ -24,15 +24,15 @@ SOFTWARE.
 
 
 export class Serializer {
-    public static toJSON(value: any) : string {
-        return JSON.stringify(value, this.replacer);
+    static toJSON(value: any) : string {
+        return JSON.stringify(value, this._replacer);
     }
      
-    public static fromJSON(json: string) : any {
+    static fromJSON(json: string) : any {
         return JSON.parse(json);
     }
     
-    private static replacer(name: string, value: any) : boolean {
-        return (name == "sessionState") ? undefined : value;
+    static _replacer(name: string, value: any) : boolean {
+        return (name == "sessionState" || name == "_sessionState") ? undefined : value;
     }
 }

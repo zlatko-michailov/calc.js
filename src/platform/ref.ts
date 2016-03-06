@@ -24,26 +24,26 @@ SOFTWARE.
 
 
 export class CellRef {
-    public constructor(columnRef: RefUnit, rowRef: RefUnit, sheetRef?: RefUnit) {
+    constructor(columnRef: RefUnit, rowRef: RefUnit, sheetRef?: RefUnit) {
         this.columnRef = columnRef;
         this.rowRef = rowRef;
         this.sheetRef = sheetRef;
     }
     
-    public columnRef: RefUnit;
-    public rowRef: RefUnit;
-    public sheetRef: RefUnit;
+    columnRef: RefUnit;
+    rowRef: RefUnit;
+    sheetRef: RefUnit;
 }
 
 
 export class RefUnit {
-    public constructor (kind: RefKind, value: number) {
+    constructor (kind: RefKind, value: number) {
         this.kind = kind;
         this.value = value;
     }
     
-    public kind: RefKind;
-    public value: number;
+    kind: RefKind;
+    value: number;
 }
 
 export const enum RefKind {

@@ -30,14 +30,14 @@ import * as Test_Platform_App from "./platform/app";
 
 
 export class Framework {
-    public static run(): void {
+    static run(): void {
         let passed: boolean = true;
         
-        passed = this.execute("util/arrays/Stack", Test_Util_Arrays.Tests.testStack) && passed;
-        passed = this.execute("util/arrays/SparseArray", Test_Util_Arrays.Tests.testSparseArray) && passed;
-        passed = this.execute("util/arrays/DualSparseArray", Test_Util_Arrays.Tests.testDualSparseArray) && passed;
-        passed = this.execute("util/json/Serializer", Test_Util_JSON.Tests.testSerializer) && passed;
-        passed = this.execute("platform/app/App/Protection", Test_Platform_App.Tests.testProtection) && passed;
+        passed = this._execute("util/arrays/Stack", Test_Util_Arrays.Tests.testStack) && passed;
+        passed = this._execute("util/arrays/SparseArray", Test_Util_Arrays.Tests.testSparseArray) && passed;
+        passed = this._execute("util/arrays/DualSparseArray", Test_Util_Arrays.Tests.testDualSparseArray) && passed;
+        passed = this._execute("util/json/Serializer", Test_Util_JSON.Tests.testSerializer) && passed;
+        passed = this._execute("platform/app/App/Protection", Test_Platform_App.Tests.testProtection) && passed;
         
         this.log(LogLevel.Important);
         this.log(LogLevel.Important, "==============");
@@ -45,7 +45,7 @@ export class Framework {
         this.log(LogLevel.Important, "==============");
     }
     
-    public static log(level: string, message?: string, ...args: any[]): void {
+    static log(level: string, message?: string, ...args: any[]): void {
         if (message) {
             let levelMessage: string = level + message;
             
@@ -61,7 +61,7 @@ export class Framework {
         }
     }
     
-    public static areEqual<T>(expected: T, actual: T, logLevel: string, message: string) : boolean {
+    static areEqual<T>(expected: T, actual: T, logLevel: string, message: string) : boolean {
         let passed = expected == actual;
         let text = (passed ? "P" : "F") + ": " + message;
         
@@ -69,7 +69,7 @@ export class Framework {
         return passed;
     }
     
-    public static isUndefined(actual: any, logLevel: string, message: string) : boolean {
+    static isUndefined(actual: any, logLevel: string, message: string) : boolean {
         let passed = undefined == actual;
         let text = (passed ? "P" : "F") + ": " + message;
         
@@ -77,7 +77,7 @@ export class Framework {
         return passed;
     }
     
-    public static throws(expectedCode: Util_Errors.ErrorCode, action: () => any, logLevel: string, message: string) : boolean {
+    static throws(expectedCode: Util_Errors.ErrorCode, action: () => any, logLevel: string, message: string) : boolean {
         let passed = false;
         
         try {
@@ -92,7 +92,7 @@ export class Framework {
         return passed;
     }
     
-    private static execute(testName: string, testMethod: () => boolean): boolean {
+    static _execute(testName: string, testMethod: () => boolean): boolean {
         this.log(LogLevel.Important);
         this.log(LogLevel.Important, testName);
         this.log(LogLevel.Important, "---------------------------------------");
@@ -105,10 +105,10 @@ export class Framework {
 
     
 export class LogLevel {
-    public static Important: string = "";
-    public static Info: string = "|   ";
-    public static Detail: string = "|   |   ";
-    public static Verbose: string = "|   |   |   ";
+    static Important: string = "";
+    static Info: string = "|   ";
+    static Detail: string = "|   |   ";
+    static Verbose: string = "|   |   |   ";
 }
 
 

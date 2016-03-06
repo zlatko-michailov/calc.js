@@ -29,23 +29,19 @@ import * as Util_Errors from "../util/errors";
 
 
 export class App {
-    private sessionState: AppSessionState = new AppSessionState(); 
-    private sheets: Util_Arrays.DualSparseArray<Sheet> = new Util_Arrays.DualSparseArray<Sheet>();
-    private protectionPassword: string;
+    sessionState: AppSessionState = new AppSessionState(); 
+    sheets: Util_Arrays.DualSparseArray<Sheet> = new Util_Arrays.DualSparseArray<Sheet>();
+    _protectionPassword: string;
     
-    public getSheets() : Util_Arrays.DualSparseArray<Sheet> {
-        return this.sheets;
-    }
-    
-    public getCellValue(cellRef: Platform_Ref.CellRef) : any {
+    getCellValue(cellRef: Platform_Ref.CellRef) : any {
         this.usingCell(cellRef, this.getCurrentCellValue);
     }
     
-    public parseCellInput(cellRef: Platform_Ref.CellRef, input?: string) : void {
+    parseCellInput(cellRef: Platform_Ref.CellRef, input?: string) : void {
         this.usingCell(cellRef, this.parseCurrentCellInput, input)
     }
     
-    private usingCell(cellRef: Platform_Ref.CellRef, action: (arg1?: any) => any, arg1?: any) : void {
+   usingCell(cellRef: Platform_Ref.CellRef, action: (arg1?: any) => any, arg1?: any) : void {
         this.sessionState.currentCellStack.push(cellRef);
         try {
             return action(arg1);
@@ -55,75 +51,67 @@ export class App {
         }
     }
     
-    private getCurrentCellValue() : any {
+    getCurrentCellValue() : any {
         // TODO
     }
     
-    public parseCurrentCellInput(input?: string) : void {
+    parseCurrentCellInput(input?: string) : void {
         // TODO
     }
     
-    public isProtected() : boolean {
-        return this.protectionPassword != undefined;
+    isProtected() : boolean {
+        return this._protectionPassword != undefined;
     }
     
-    public setProtection(password: string) {
+    setProtection(password: string) {
         if (this.isProtected()) {
             throw new Util_Errors.Exception(Util_Errors.ErrorCode.InvalidOperation, "This app is already protected. You must remove protection before setting it again.");
         }
         
-        this.protectionPassword = password;
+        this._protectionPassword = password;
     }
     
-    public removeProtection(password: string) {
+    removeProtection(password: string) {
         if (this.isProtected()) {
-            if (this.protectionPassword != password) {
+            if (this._protectionPassword != password) {
                 throw new Util_Errors.Exception(Util_Errors.ErrorCode.InvalidArgument, "The provided protection password doesn't match the original.");
             }
             
-            this.protectionPassword = undefined;
+            this._protectionPassword = undefined;
         }
     }
 }
 
 
 export class Sheet {
-    private columns: Util_Arrays.DualSparseArray<Column> = new Util_Arrays.DualSparseArray<Column>();
-
-    public getColumns() : Util_Arrays.DualSparseArray<Column> {
-        return this.columns;
-    }
+    columns: Util_Arrays.DualSparseArray<Column> = new Util_Arrays.DualSparseArray<Column>();
 }
 
 
 export class Column {
-    private cells: Util_Arrays.DualSparseArray<Cell> = new Util_Arrays.DualSparseArray<Cell>();
-
-    public getCells() : Util_Arrays.DualSparseArray<Cell> {
-        return this.cells;
-    }
+    cells: Util_Arrays.DualSparseArray<Cell> = new Util_Arrays.DualSparseArray<Cell>();
 }
 
 
 export class Cell {
-    private sessionState: CellSessionState = new CellSessionState();
-    private input: string;
-    private formula: () => any;
-    private value: any;
+    sessionState: CellSessionState = new CellSessionState();
+    input: string;
+    formula: () => any;
+    value: any;
     
-    public isUnderCalc() : boolean {
+    isUnderCalc() : boolean {
         return false; // TODO:
     }
 }
 
 
 class AppSessionState {
-    public currentCellStack: Util_Arrays.Stack<Platform_Ref.CellRef> = new Util_Arrays.Stack<Platform_Ref.CellRef>();
-    public currentCalcRunId: number = 0;
+    currentCellStack: Util_Arrays.Stack<Platform_Ref.CellRef> = new Util_Arrays.Stack<Platform_Ref.CellRef>();
+    currentCalcRunId: number = 0;
 }
 
 
 class CellSessionState {
-    public lastCalcRunId: number = 0;
+    lastCalcRunId: number = 0;
 }
 

@@ -29,7 +29,7 @@ import * as Test_Main from "../main";
 
 
 export class Tests {
-    public static testSerializer() : boolean {
+    static testSerializer() : boolean {
         let passed: boolean = true;
         
         let sparseArray: Util_Arrays.SparseArray<number> = new Util_Arrays.SparseArray<number>();
@@ -56,7 +56,7 @@ export class Tests {
         };
         
         let actualJSON: string = Util_JSON.Serializer.toJSON(expectedValue);
-        let expectedJSON: string = '{"a":42,"b":"foo","sub":{"x":[2016,3,2],"y":{"2":99,"42":88,"2016":77},"z":{"count":3,"nextId":3,"byId":{"0":{"index":0,"value":66},"1":{"index":1,"value":55},"2":{"index":2,"value":44}},"byIndex":[0,1,2]}}}';
+        let expectedJSON: string = '{"a":42,"b":"foo","sub":{"x":[2016,3,2],"y":{"2":99,"42":88,"2016":77},"z":{"_count":3,"_nextId":3,"_byId":{"0":{"index":0,"value":66},"1":{"index":1,"value":55},"2":{"index":2,"value":44}},"_byIndex":[0,1,2]}}}';
         passed = Test_Main.Framework.areEqual(expectedJSON, actualJSON, Test_Main.LogLevel.Info, "toJSON") && passed;
         
         let actualValue: any = Util_JSON.Serializer.fromJSON(actualJSON);

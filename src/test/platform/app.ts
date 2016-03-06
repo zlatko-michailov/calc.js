@@ -30,7 +30,7 @@ import * as Test_Main from "../main";
 
 
 export class Tests {
-    public static testProtection() : boolean {
+    static testProtection() : boolean {
         let passed: boolean = true;
         let app: Platform_App.App = new Platform_App.App();
 
