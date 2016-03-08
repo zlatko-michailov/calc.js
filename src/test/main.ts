@@ -37,6 +37,7 @@ export class Framework {
         passed = this._execute("util/arrays/SparseArray", Test_Util_Arrays.Tests.testSparseArray) && passed;
         passed = this._execute("util/arrays/DualSparseArray", Test_Util_Arrays.Tests.testDualSparseArray) && passed;
         passed = this._execute("util/json/Serializer", Test_Util_JSON.Tests.testSerializer) && passed;
+        passed = this._execute("platform/App/UsingCell", Test_Platform_App.Tests.testUsingCell) && passed;
         
         this.log(LogLevel.Important);
         this.log(LogLevel.Important, "==============");
@@ -61,7 +62,7 @@ export class Framework {
     }
     
     static areEqual<T>(expected: T, actual: T, logLevel: string, message: string) : boolean {
-        let passed = expected == actual;
+        let passed = expected === actual;
         let text = (passed ? "P" : "F") + ": " + message;
         
         Framework.log(logLevel, text, { expected: expected, actual: actual });
@@ -69,7 +70,7 @@ export class Framework {
     }
     
     static isUndefined(actual: any, logLevel: string, message: string) : boolean {
-        let passed = undefined == actual;
+        let passed = undefined === actual;
         let text = (passed ? "P" : "F") + ": " + message;
         
         Framework.log(logLevel, text, { actual: actual });
