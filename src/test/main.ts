@@ -37,7 +37,6 @@ export class Framework {
         passed = this._execute("util/arrays/SparseArray", Test_Util_Arrays.Tests.testSparseArray) && passed;
         passed = this._execute("util/arrays/DualSparseArray", Test_Util_Arrays.Tests.testDualSparseArray) && passed;
         passed = this._execute("util/json/Serializer", Test_Util_JSON.Tests.testSerializer) && passed;
-        passed = this._execute("platform/app/App/Protection", Test_Platform_App.Tests.testProtection) && passed;
         
         this.log(LogLevel.Important);
         this.log(LogLevel.Important, "==============");

@@ -30,24 +30,4 @@ import * as Test_Main from "../main";
 
 
 export class Tests {
-    static testProtection() : boolean {
-        let passed: boolean = true;
-        let app: Platform_App.App = new Platform_App.App();
-
-        passed = Test_Main.Framework.areEqual(false, app.isProtected(), Test_Main.LogLevel.Info, "not protected by default") && passed;
-        app.removeProtection("anything");
-        passed = Test_Main.Framework.areEqual(false, app.isProtected(), Test_Main.LogLevel.Info, "still not protected") && passed;
-        
-        app.setProtection("foOBar");
-        passed = Test_Main.Framework.areEqual(true, app.isProtected(), Test_Main.LogLevel.Info, "protected") && passed;
-        passed = Test_Main.Framework.throws(Util_Errors.ErrorCode.InvalidOperation, () => app.setProtection("anything"), Test_Main.LogLevel.Info, "protect protected") && passed;
-        passed = Test_Main.Framework.areEqual(true, app.isProtected(), Test_Main.LogLevel.Info, "still protected (1)") && passed;
-        passed = Test_Main.Framework.throws(Util_Errors.ErrorCode.InvalidArgument, () => app.removeProtection("foobar"), Test_Main.LogLevel.Info, "wrong password") && passed;
-        passed = Test_Main.Framework.areEqual(true, app.isProtected(), Test_Main.LogLevel.Info, "still protected (2)") && passed;
-        
-        app.removeProtection("foOBar");
-        passed = Test_Main.Framework.areEqual(false, app.isProtected(), Test_Main.LogLevel.Info, "remove protection") && passed;
-
-        return passed;
-    }
 }

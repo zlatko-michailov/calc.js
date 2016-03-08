@@ -31,7 +31,6 @@ import * as Util_Errors from "../util/errors";
 export class App {
     sessionState: AppSessionState = new AppSessionState(); 
     sheets: Util_Arrays.DualSparseArray<Sheet> = new Util_Arrays.DualSparseArray<Sheet>();
-    _protectionPassword: string;
     
     getCellValue(cellRef: Platform_Ref.CellRef) : any {
         this.usingCell(cellRef, this.getCurrentCellValue);
@@ -57,28 +56,6 @@ export class App {
     
     parseCurrentCellInput(input?: string) : void {
         // TODO
-    }
-    
-    isProtected() : boolean {
-        return this._protectionPassword != undefined;
-    }
-    
-    setProtection(password: string) {
-        if (this.isProtected()) {
-            throw new Util_Errors.Exception(Util_Errors.ErrorCode.InvalidOperation, "This app is already protected. You must remove protection before setting it again.");
-        }
-        
-        this._protectionPassword = password;
-    }
-    
-    removeProtection(password: string) {
-        if (this.isProtected()) {
-            if (this._protectionPassword != password) {
-                throw new Util_Errors.Exception(Util_Errors.ErrorCode.InvalidArgument, "The provided protection password doesn't match the original.");
-            }
-            
-            this._protectionPassword = undefined;
-        }
     }
 }
 
