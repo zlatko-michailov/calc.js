@@ -30,7 +30,7 @@ import * as Util_Errors from "../util/errors";
 
 export class App {
     sessionState: AppSessionState = new AppSessionState(); 
-    sheets: Util_Arrays.DualSparseArray<Sheet> = new Util_Arrays.DualSparseArray<Sheet>();
+    sheets: StorageArray<Sheet> = new StorageArray<Sheet>();
     
     getCellValue(cellRef: Platform_Ref.CellRef) : any {
         this.usingCell(cellRef, this.getCurrentCellValue);
@@ -41,6 +41,16 @@ export class App {
     }
     
    usingCell(cellRef: Platform_Ref.CellRef, action: (arg1?: any) => any, arg1?: any) : void {
+        // Make sure all CellRef's in the stack are fully initialized.
+        if (cellRef.sheetRef === undefined) {
+            let currentCellRef: Platform_Ref.CellRef = this.sessionState.currentCellStack.peek();
+            if (currentCellRef === undefined) {
+                throw new Util_Errors.Exception(Util_Errors.ErrorCode.InvalidArgument, "The first cell to be calculated must be fully identified.");
+            }
+            
+            cellRef.sheetRef = currentCellRef.sheetRef;
+        }
+        
         this.sessionState.currentCellStack.push(cellRef);
         try {
             return action(arg1);
@@ -51,44 +61,145 @@ export class App {
     }
     
     getCurrentCellValue() : any {
+        let currentCell: Cell = this.getCurrentCell();
         // TODO
     }
     
     parseCurrentCellInput(input?: string) : void {
-        // TODO
+        let currentCell: Cell = this.getCurrentCell();
+        currentCell.reset();
+        
+        currentCell.input = input;
+        
+        if (input != undefined) {
+            // Check if the user input is a formula.        
+            input = input.trim();
+            if (input.charAt(0) === "=") {
+                let formulaBody = input.substring(1);
+                try {
+                    currentCell.formula = () => ((new Function("return " + formulaBody))());
+                }
+                catch (ex) {
+                    currentCell.reset();
+                    throw new Util_Errors.Exception(Util_Errors.ErrorCode.InvalidArgument, "Invalid formula.");
+                }
+            }
+            else {
+                try {
+                    // Try to evaluate the input to get the actual type.
+                    currentCell.value = eval(input);
+                }
+                catch(ex) {
+                    // If evaluation fails, treat the user input as a string literal. 
+                    currentCell.value = input;
+                }
+            }
+        }
+        
+        // Recalc this cell and its consumers.
+        currentCell.recalc();
+    }
+    
+    getCurrentCell() : Cell {
+        let currentCellRef: Platform_Ref.CellRef = this.sessionState.currentCellStack.peek();
+        if (currentCellRef === undefined) {
+            return undefined;
+        }
+        
+        let currentSheet: Sheet = this.sheets.getByRefUnit(currentCellRef.sheetRef);
+        let currentColumn: Column = currentSheet.columns.getByRefUnit(currentCellRef.columnRef);
+        let currentCell: Cell = currentColumn.cells.getByRefUnit(currentCellRef.rowRef);
+        
+        return currentCell;
     }
 }
 
 
 export class Sheet {
-    columns: Util_Arrays.DualSparseArray<Column> = new Util_Arrays.DualSparseArray<Column>();
+    columns: StorageArray<Column> = new StorageArray<Column>();
 }
 
 
 export class Column {
-    cells: Util_Arrays.DualSparseArray<Cell> = new Util_Arrays.DualSparseArray<Cell>();
+    cells: StorageArray<Cell> = new StorageArray<Cell>();
 }
 
 
 export class Cell {
-    sessionState: CellSessionState = new CellSessionState();
+    sessionState: CellSessionState;
     input: string;
     formula: () => any;
     value: any;
     
+    constructor() {
+        this.reset();
+    }
+    
+    reset() : void {
+        this.input = undefined;
+        this.formula = undefined;
+        this.value = undefined;
+        if (this.sessionState === undefined) {
+            this.sessionState = new CellSessionState();
+        }
+        else {
+            this.sessionState.reset();
+        }
+    }
+    
     isUnderCalc() : boolean {
         return false; // TODO:
+    }
+    
+    recalc() : void {
+        // TODO
     }
 }
 
 
 class AppSessionState {
-    currentCellStack: Util_Arrays.Stack<Platform_Ref.CellRef> = new Util_Arrays.Stack<Platform_Ref.CellRef>();
-    currentCalcRunId: number = 0;
+    currentCellStack: Util_Arrays.Stack<Platform_Ref.CellRef>;
+    currentCalcRunId: number;
+    
+    constructor() {
+        this.reset();
+    }
+    
+    reset() : void {
+        this.currentCellStack = new Util_Arrays.Stack<Platform_Ref.CellRef>();
+        this.currentCalcRunId = 0;
+    }
 }
 
 
 class CellSessionState {
-    lastCalcRunId: number = 0;
+    lastCalcRunId: number;
+    providerCells: Array<Platform_Ref.CellRef>; 
+    consumerCells: Array<Platform_Ref.CellRef>;
+    
+    constructor() {
+        this.reset();
+    } 
+    
+    reset() : void {
+        this.lastCalcRunId = 0;
+        this.providerCells = new Array<Platform_Ref.CellRef>();
+        if (this.consumerCells === undefined) {
+            this.consumerCells = new Array<Platform_Ref.CellRef>();
+        }
+    }
 }
 
+
+class StorageArray<T> extends Util_Arrays.DualSparseArray<T> {
+    getByRefUnit(refUnit: Platform_Ref.RefUnit) : T {
+        if (refUnit.kind == Platform_Ref.RefKind.ById) {
+            return this.getById(refUnit.value); 
+        }
+        else if (refUnit.kind == Platform_Ref.RefKind.ByIndex) {
+            return this.getByIndex(refUnit.value); 
+        }
+        
+        return undefined;
+    }
+}

@@ -28,7 +28,7 @@ import * as Util_Errors from "./errors";
 
 export class Stack<T> extends Array<T> {
     peek(i?: number): T {
-        if (!i) {
+        if (i === undefined) {
             i = 0;
         }
         
@@ -46,7 +46,7 @@ export class DualSparseArray<T> {
     _count: number = 0;
     _nextId: number = 0;
     _byId: SparseArray<IndexValue<T>> = new SparseArray<IndexValue<T>>();
-    _byIndex: number[] = [];
+    _byIndex: Array<number> = new Array<number>();
     
     insert(index: number, count?: number) : void {
         if (index < 0 || index > this._count) {

@@ -30,7 +30,7 @@ import * as Test_Platform_App from "./platform/app";
 
 
 export class Framework {
-    static run(): void {
+    static run(): boolean {
         let passed: boolean = true;
         
         passed = this._execute("util/arrays/Stack", Test_Util_Arrays.Tests.testStack) && passed;
@@ -43,6 +43,8 @@ export class Framework {
         this.log(LogLevel.Important, "==============");
         this.log(LogLevel.Important, passed ? "    PASSED" : "+++ FAILED +++" );
         this.log(LogLevel.Important, "==============");
+        
+        return passed;
     }
     
     static log(level: string, message?: string, ...args: any[]): void {
