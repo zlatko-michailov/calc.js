@@ -30,17 +30,17 @@ import * as Util_Errors from "../util/errors";
 
 export class App {
     sessionState: AppSessionState = new AppSessionState(); 
-    sheets: StorageArray<Sheet> = new StorageArray<Sheet>();
+    sheets: StorageArray<Sheet> = new StorageArray<Sheet>(() => new Sheet());
     
     getCellValue(cellRef: Platform_Ref.CellRef) : any {
-        this.usingCell(cellRef, this.getCurrentCellValue);
+        this.usingCell(cellRef, () => this.getCurrentCellValue());
     }
     
     parseCellInput(cellRef: Platform_Ref.CellRef, input?: string) : void {
-        this.usingCell(cellRef, this.parseCurrentCellInput, input)
+        this.usingCell(cellRef, () => this.parseCurrentCellInput(input));
     }
     
-   usingCell(cellRef: Platform_Ref.CellRef, action: (arg1?: any) => any, arg1?: any) : void {
+   usingCell(cellRef: Platform_Ref.CellRef, action: () => any) : void {
         // Make sure all CellRef's in the stack are fully initialized.
         if (cellRef.sheetRef === undefined) {
             let currentCellRef: Platform_Ref.CellRef = this.sessionState.currentCellStack.peek();
@@ -53,7 +53,7 @@ export class App {
         
         this.sessionState.currentCellStack.push(cellRef);
         try {
-            return action(arg1);
+            return action();
         }
         finally {
            this.sessionState.currentCellStack.pop(); 
@@ -106,22 +106,26 @@ export class App {
             return undefined;
         }
         
-        let currentSheet: Sheet = this.sheets.getByRefUnit(currentCellRef.sheetRef);
-        let currentColumn: Column = currentSheet.columns.getByRefUnit(currentCellRef.columnRef);
-        let currentCell: Cell = currentColumn.cells.getByRefUnit(currentCellRef.rowRef);
+        return this.getCell(currentCellRef);
+    }
         
-        return currentCell;
+    getCell(cellRef: Platform_Ref.CellRef) : Cell {
+        let sheet: Sheet = this.sheets.getByRefUnit(cellRef.sheetRef);
+        let column: Column = sheet.columns.getByRefUnit(cellRef.columnRef);
+        let cell: Cell = column.cells.getByRefUnit(cellRef.rowRef);
+        
+        return cell;
     }
 }
 
 
 export class Sheet {
-    columns: StorageArray<Column> = new StorageArray<Column>();
+    columns: StorageArray<Column> = new StorageArray<Column>(() => new Column());
 }
 
 
 export class Column {
-    cells: StorageArray<Cell> = new StorageArray<Cell>();
+    cells: StorageArray<Cell> = new StorageArray<Cell>(() => new Cell());
 }
 
 
@@ -192,14 +196,31 @@ class CellSessionState {
 
 
 class StorageArray<T> extends Util_Arrays.DualSparseArray<T> {
+    newElement: () => T;
+    
+    constructor(newElement: () => T) {
+        super();
+        this.newElement = newElement;
+    }
+    
     getByRefUnit(refUnit: Platform_Ref.RefUnit) : T {
+        let element: T = undefined;
+        
         if (refUnit.kind == Platform_Ref.RefKind.ById) {
-            return this.getById(refUnit.value); 
+            element = this.getById(refUnit.value);
+            if (element === undefined) {
+                element = this.newElement();
+                this.setById(refUnit.value, element);
+            } 
         }
         else if (refUnit.kind == Platform_Ref.RefKind.ByIndex) {
-            return this.getByIndex(refUnit.value); 
+            element = this.getByIndex(refUnit.value);
+            if (element === undefined) {
+                element = this.newElement();
+                this.setByIndex(refUnit.value, element);
+            } 
         }
         
-        return undefined;
+        return element;
     }
 }

@@ -104,10 +104,14 @@ export class DualSparseArray<T> {
     
     getById(id: number) : T {
         let indexValue: IndexValue<T> = this._byId[id];
-        return indexValue ? indexValue.value : undefined;
+        return indexValue === undefined ? undefined : indexValue.value;
     }
     
     setById(id: number, value: T) : void {
+        if (this._byId[id] === undefined) {
+            this._byId[id] = new IndexValue<T>();
+        }
+        
         this._byId[id].value = value;
     }
     

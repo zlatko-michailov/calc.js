@@ -38,6 +38,7 @@ export class Framework {
         passed = this._execute("util/arrays/DualSparseArray", Test_Util_Arrays.Tests.testDualSparseArray) && passed;
         passed = this._execute("util/json/Serializer", Test_Util_JSON.Tests.testSerializer) && passed;
         passed = this._execute("platform/App/UsingCell", Test_Platform_App.Tests.testUsingCell) && passed;
+        passed = this._execute("platform/App/ParseCellInput", Test_Platform_App.Tests.testParseCellInput) && passed;
         
         this.log(LogLevel.Important);
         this.log(LogLevel.Important, "==============");
