@@ -85,6 +85,11 @@ export class App {
                 }
             }
             else {
+                // eval() throws on object literals. So make them explicit. 
+                if (input.charAt(0) === "{" && input.charAt(input.length - 1) === "}") {
+                    input = "new Object(" + input + ")";
+                }
+                
                 try {
                     // Try to evaluate the input to get the actual type.
                     currentCell.value = eval(input);

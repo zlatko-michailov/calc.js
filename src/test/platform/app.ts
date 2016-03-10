@@ -78,7 +78,7 @@ export class Tests {
         ref = Lib_Global.cr(34, 56, 7); 
         app.parseCellInput(ref, "[23, 34, 45]");
         val = app.getCell(ref).value;
-        passed = Test_Main.Framework.areEqual("array", typeof val, Test_Main.LogLevel.Info, "typeof [23, 34, 45]") && passed;
+        passed = Test_Main.Framework.areEqual("object", typeof val, Test_Main.LogLevel.Info, "typeof [23, 34, 45]") && passed;
         passed = Test_Main.Framework.areEqual(JSON.stringify([23, 34, 45]), JSON.stringify(app.getCell(ref).value), Test_Main.LogLevel.Info, "[23, 34, 45]") && passed;
 
         ref = Lib_Global.cr(45, 67, 8); 
@@ -88,9 +88,15 @@ export class Tests {
         passed = Test_Main.Framework.areEqual(JSON.stringify({ a: 43, b: "bar"}), JSON.stringify(app.getCell(ref).value), Test_Main.LogLevel.Info, "{ a: 43, b: 'bar'}}") && passed;
 
         let json : string = Util_JSON.Serializer.toJSON(app);
+        // TODO: Verify whole app
 
-        app.parseCellInput(Lib_Global.cr(12, 34, 5), "new Date(2016, 3, 9, 21, 2, 12)");
+        ref = Lib_Global.cr(12, 34, 5); 
+        app.parseCellInput(ref, "new Date(2016, 3, 9, 21, 2, 12)");
+        val = app.getCell(ref).value;
+        passed = Test_Main.Framework.areEqual("object", typeof val, Test_Main.LogLevel.Info, "typeof new Date(2016, 3, 9, 21, 2, 12)") && passed;
+        passed = Test_Main.Framework.areEqual(JSON.stringify(new Date(2016, 3, 9, 21, 2, 12)), JSON.stringify(app.getCell(ref).value), Test_Main.LogLevel.Info, "new Date(2016, 3, 9, 21, 2, 12)") && passed;
         
+        // TODO:
         app.parseCellInput(Lib_Global.cr(23, 45, 6), "=56 + 78");
 
         app.parseCellInput(Lib_Global.cr(34, 56, 7), "function() { return 'abcd'.length; }");
