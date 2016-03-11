@@ -77,7 +77,7 @@ export class App {
             if (input.charAt(0) === "=") {
                 let formulaBody = input.substring(1);
                 try {
-                    currentCell.formula = () => ((new Function("return " + formulaBody))());
+                    currentCell.formula = () => (new Function("return " + formulaBody))();
                 }
                 catch (ex) {
                     currentCell.reset();

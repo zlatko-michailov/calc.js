@@ -24,7 +24,12 @@ SOFTWARE.
 
 
 import * as Platform_Ref from "../platform/ref";
+import * as Platform_App from "../platform/app";
 
+
+export function value(cellRef: Platform_Ref.CellRef) : any {
+    return undefined; // TODO: How to get the current app session?
+}
 
 export function cr(columnIndex: number, rowIndex: number, sheetIndex?: number) : Platform_Ref.CellRef {
     return new Platform_Ref.CellRef(
