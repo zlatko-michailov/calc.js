@@ -99,14 +99,18 @@ export class Tests {
         ref = Lib_Global.cr(23, 45, 9); 
         app.parseCellInput(Lib_Global.cr(23, 45, 9), "=56 + 78");
         val = app.getCell(ref).formula();
-        passed = Test_Main.Framework.areEqual("number", typeof val, Test_Main.LogLevel.Info, "typeof 56 + 78") && passed;
         passed = Test_Main.Framework.areEqual("function", typeof app.getCell(ref).formula, Test_Main.LogLevel.Info, "typeof =56 + 78") && passed;
+        passed = Test_Main.Framework.areEqual("number", typeof val, Test_Main.LogLevel.Info, "typeof 56 + 78") && passed;
         passed = Test_Main.Framework.areEqual(56 + 78, val, Test_Main.LogLevel.Info, "=56 + 78") && passed;
 
         ref = Lib_Global.cr(34, 56, 9); 
         app.parseCellInput(Lib_Global.cr(34, 56, 9), "=function () { return 'abcd'.length; }");
         val = app.getCell(ref).formula();
-        passed = Test_Main.Framework.areEqual("function", typeof app.getCell(ref).formula, Test_Main.LogLevel.Info, "typeof function() { return 'abcd'.length; }") && passed;
+        let valval = val();
+        passed = Test_Main.Framework.areEqual("function", typeof app.getCell(ref).formula, Test_Main.LogLevel.Info, "typeof =function() { return 'abcd'.length; }") && passed;
+        passed = Test_Main.Framework.areEqual("function", typeof val, Test_Main.LogLevel.Info, "typeof function() { return 'abcd'.length; }") && passed;
+        passed = Test_Main.Framework.areEqual("number", typeof valval, Test_Main.LogLevel.Info, "typeof (function() { return 'abcd'.length; })()") && passed;
+        passed = Test_Main.Framework.areEqual("abcd".length, valval, Test_Main.LogLevel.Info, "(function() { return 'abcd'.length; })()") && passed;
         
         // TODO:
         //ref = Lib_Global.cr(45, 67, 9); 
