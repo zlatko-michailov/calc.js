@@ -28,7 +28,7 @@ import * as Platform_App from "../platform/app";
 
 
 export function value(cellRef: Platform_Ref.CellRef) : any {
-    return undefined; // TODO: How to get the current app session?
+    return Platform_App.App.currentApp.getCellValue(cellRef);
 }
 
 export function cr(columnIndex: number, rowIndex: number, sheetIndex?: number) : Platform_Ref.CellRef {

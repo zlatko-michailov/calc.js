@@ -29,6 +29,7 @@ import * as Util_Errors from "../util/errors";
 
 
 export class App {
+    static currentApp: App;
     sessionState: AppSessionState = new AppSessionState(); 
     sheets: StorageArray<Sheet> = new StorageArray<Sheet>(() => new Sheet());
     
@@ -62,7 +63,7 @@ export class App {
     
     getCurrentCellValue() : any {
         let currentCell: Cell = this.getCurrentCell();
-        // TODO
+        return 20160313;
     }
     
     parseCurrentCellInput(input?: string) : void {
@@ -77,7 +78,7 @@ export class App {
             if (input.charAt(0) === "=") {
                 let formulaBody = input.substring(1);
                 try {
-                    currentCell.formula = () => (new Function("return " + formulaBody))();
+                    currentCell.formula = () => (new Function("return ".concat(formulaBody)))();
                 }
                 catch (ex) {
                     currentCell.reset();
