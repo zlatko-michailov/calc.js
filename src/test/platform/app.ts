@@ -120,10 +120,10 @@ export class Tests {
         eval(ev);
 
         ref = Lib_Global.cr(45, 67, 9); 
-        app.parseCellInput(ref, "=value(cr(23, 45)) + value(cr(34, 56))");
+        app.parseCellInput(ref, "=value(cr(23, 45, 9)) + value(cr(34, 56, 9))");
         val = app.getCell(ref).formula();
         passed = Test_Main.Framework.areEqual("function", typeof app.getCell(ref).formula, Test_Main.LogLevel.Info, "typeof =value(cr(23, 45)) + value(cr(34, 56))") && passed;
-        //passed = Test_Main.Framework.areEqual("function", typeof val, Test_Main.LogLevel.Info, "typeof value(cr(23, 45)) + value(cr(34, 56))") && passed;
+        passed = Test_Main.Framework.areEqual("number", typeof val, Test_Main.LogLevel.Info, "typeof value(cr(23, 45)) + value(cr(34, 56))") && passed;
         passed = Test_Main.Framework.areEqual((56 + 78) + "abcd".length, val, Test_Main.LogLevel.Info, "=value(cr(23, 45)) + value(cr(34, 56))") && passed;
         
         json = Util_JSON.Serializer.toJSON(app);

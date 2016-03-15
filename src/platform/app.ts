@@ -34,14 +34,14 @@ export class App {
     sheets: StorageArray<Sheet> = new StorageArray<Sheet>(() => new Sheet());
     
     getCellValue(cellRef: Platform_Ref.CellRef) : any {
-        this.usingCell(cellRef, () => this.getCurrentCellValue());
+        return this.usingCell(cellRef, () => this.getCurrentCellValue());
     }
     
     parseCellInput(cellRef: Platform_Ref.CellRef, input?: string) : void {
         this.usingCell(cellRef, () => this.parseCurrentCellInput(input));
     }
     
-   usingCell(cellRef: Platform_Ref.CellRef, action: () => any) : void {
+   usingCell(cellRef: Platform_Ref.CellRef, action: () => any) : any {
         // Make sure all CellRef's in the stack are fully initialized.
         if (cellRef.sheetRef === undefined) {
             let currentCellRef: Platform_Ref.CellRef = this.sessionState.currentCellStack.peek();
@@ -78,7 +78,7 @@ export class App {
             if (input.charAt(0) === "=") {
                 let formulaBody = input.substring(1);
                 try {
-                    currentCell.formula = () => (new Function("return ".concat(formulaBody)))();
+                    currentCell.formula = new Function("return ".concat(formulaBody));
                 }
                 catch (ex) {
                     currentCell.reset();
@@ -138,7 +138,7 @@ export class Column {
 export class Cell {
     sessionState: CellSessionState;
     input: string;
-    formula: () => any;
+    formula: Function;
     value: any;
     
     constructor() {
