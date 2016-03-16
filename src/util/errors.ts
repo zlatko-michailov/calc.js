@@ -37,5 +37,7 @@ export class Exception {
 export const enum ErrorCode {
     IndexOutOfRange = 1,
     InvalidOperation = 2,
-    InvalidArgument = 3
+    InvalidArgument = 3,
+    CircularReference = 4,
+    InvalidFormula = 5
 }

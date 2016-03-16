@@ -26,6 +26,7 @@ SOFTWARE.
 import * as Platform_Ref from "./ref";
 import * as Util_Arrays from "../util/arrays";
 import * as Util_Errors from "../util/errors";
+import * as Util_JSON from "../util/json";
 
 
 export class App {
@@ -51,19 +52,38 @@ export class App {
             
             cellRef.sheetRef = currentCellRef.sheetRef;
         }
+
+        // The referenced cell must not be under calc.
+        let cell: Cell = this.getCell(cellRef);        
+        if (cell.sessionState.isUnderCalc) {
+            throw new Util_Errors.Exception(Util_Errors.ErrorCode.CircularReference, Util_JSON.Serializer.toJSON(cell));
+        }
         
+        cell.sessionState.isUnderCalc = true;
         this.sessionState.currentCellStack.push(cellRef);
         try {
             return action();
         }
         finally {
-           this.sessionState.currentCellStack.pop(); 
+           this.sessionState.currentCellStack.pop();
+           cell.sessionState.isUnderCalc = false; 
         }
     }
     
     getCurrentCellValue() : any {
         let currentCell: Cell = this.getCurrentCell();
-        return 20160313;
+        
+        if (currentCell.formula != undefined) {
+            currentCell.sessionState.lastCalcRunId = this.sessionState.currentCalcRunId;
+            try {
+                currentCell.value = currentCell.formula();
+            }
+            catch (ex) {
+                throw new Util_Errors.Exception(Util_Errors.ErrorCode.InvalidFormula, currentCell.input);
+            }
+        }
+        
+        return currentCell.value;
     }
     
     parseCurrentCellInput(input?: string) : void {
@@ -107,12 +127,16 @@ export class App {
     }
     
     getCurrentCell() : Cell {
-        let currentCellRef: Platform_Ref.CellRef = this.sessionState.currentCellStack.peek();
+        let currentCellRef: Platform_Ref.CellRef = this.getCurrentCellRef();
         if (currentCellRef === undefined) {
             return undefined;
         }
         
         return this.getCell(currentCellRef);
+    }
+        
+    getCurrentCellRef() : Platform_Ref.CellRef {
+        return this.sessionState.currentCellStack.peek();
     }
         
     getCell(cellRef: Platform_Ref.CellRef) : Cell {
@@ -157,10 +181,6 @@ export class Cell {
         }
     }
     
-    isUnderCalc() : boolean {
-        return false; // TODO:
-    }
-    
     recalc() : void {
         // TODO
     }
@@ -183,6 +203,7 @@ class AppSessionState {
 
 
 class CellSessionState {
+    isUnderCalc : boolean;
     lastCalcRunId: number;
     providerCells: Array<Platform_Ref.CellRef>; 
     consumerCells: Array<Platform_Ref.CellRef>;
