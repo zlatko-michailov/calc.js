@@ -33,12 +33,13 @@ export class Framework {
     static run(): boolean {
         let passed: boolean = true;
         
-        passed = this._execute("util/arrays/Stack", Test_Util_Arrays.Tests.testStack) && passed;
-        passed = this._execute("util/arrays/SparseArray", Test_Util_Arrays.Tests.testSparseArray) && passed;
-        passed = this._execute("util/arrays/DualSparseArray", Test_Util_Arrays.Tests.testDualSparseArray) && passed;
-        passed = this._execute("util/json/Serializer", Test_Util_JSON.Tests.testSerializer) && passed;
-        passed = this._execute("platform/App/UsingCell", Test_Platform_App.Tests.testUsingCell) && passed;
-        passed = this._execute("platform/App/ParseCellInput", Test_Platform_App.Tests.testParseCellInput) && passed;
+        passed = this._execute("util/arrays:Stack", Test_Util_Arrays.Tests.testStack) && passed;
+        passed = this._execute("util/arrays:SparseArray", Test_Util_Arrays.Tests.testSparseArray) && passed;
+        passed = this._execute("util/arrays:DualSparseArray", Test_Util_Arrays.Tests.testDualSparseArray) && passed;
+        passed = this._execute("util/json:Serializer", Test_Util_JSON.Tests.testSerializer) && passed;
+        passed = this._execute("platform:App.usingCell", Test_Platform_App.Tests.testUsingCell) && passed;
+        passed = this._execute("platform:App.parseCellInput", Test_Platform_App.Tests.testParseCellInput) && passed;
+        passed = this._execute("platform:App.getCellValue", Test_Platform_App.Tests.testGetCellValue) && passed;
         
         this.log(LogLevel.Important);
         this.log(LogLevel.Important, "==============");

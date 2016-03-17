@@ -128,4 +128,43 @@ export class Tests {
 
         return passed;
     }
+    
+    static testGetCellValue() : boolean {
+        let app: Platform_App.App = new Platform_App.App();
+        Platform_App.App.currentApp = app;
+        Lib_Global.Global.ensure();
+        
+        let passed: boolean = true;
+
+        let ref1 : Platform_Ref.CellRef = Lib_Global.Global.cr(1, 1, 9); 
+        app.parseCellInput(ref1, "16");
+        let val: any = app.getCellValue(ref1);
+        passed = Test_Main.Framework.areEqual("number", typeof val, Test_Main.LogLevel.Info, "typeof 16") && passed;
+        passed = Test_Main.Framework.areEqual(16, val, Test_Main.LogLevel.Info, "16") && passed;
+        
+        let ref2 = Lib_Global.Global.cr(2, 2, 9); 
+        app.parseCellInput(ref2, "=value(cr(1, 1, 9)) + 5");
+        val = app.getCellValue(ref2);
+        passed = Test_Main.Framework.areEqual("number", typeof val, Test_Main.LogLevel.Info, "typeof =value(cr(1, 1, 9)) + 5") && passed;
+        passed = Test_Main.Framework.areEqual(21, val, Test_Main.LogLevel.Info, "21") && passed;
+        
+        let ref3 = Lib_Global.Global.cr(3, 3, 9); 
+        app.parseCellInput(ref3, "=value(cr(2, 2, 9)) + 6");
+        val = app.getCellValue(ref3);
+        passed = Test_Main.Framework.areEqual("number", typeof val, Test_Main.LogLevel.Info, "typeof =value(cr(2, 2, 9)) + 6") && passed;
+        passed = Test_Main.Framework.areEqual(27, val, Test_Main.LogLevel.Info, "27") && passed;
+        
+        app.parseCellInput(ref1, "3");
+        val = app.getCellValue(ref1);
+        passed = Test_Main.Framework.areEqual("number", typeof val, Test_Main.LogLevel.Info, "typeof 3") && passed;
+        passed = Test_Main.Framework.areEqual(3, val, Test_Main.LogLevel.Info, "3") && passed;
+        val = app.getCellValue(ref2);
+        passed = Test_Main.Framework.areEqual("number", typeof val, Test_Main.LogLevel.Info, "typeof 8") && passed;
+        passed = Test_Main.Framework.areEqual(8, val, Test_Main.LogLevel.Info, "8") && passed;
+        val = app.getCellValue(ref3);
+        passed = Test_Main.Framework.areEqual("number", typeof val, Test_Main.LogLevel.Info, "typeof 14") && passed;
+        passed = Test_Main.Framework.areEqual(14, val, Test_Main.LogLevel.Info, "14") && passed;
+        
+        return passed;
+    }
 }

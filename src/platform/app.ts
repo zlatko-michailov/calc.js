@@ -73,6 +73,7 @@ export class App {
     getCurrentCellValue() : any {
         let currentCell: Cell = this.getCurrentCell();
         
+        // TODO: Invoke only if necessary.
         if (currentCell.formula != undefined) {
             currentCell.sessionState.lastCalcRunId = this.sessionState.currentCalcRunId;
             try {
