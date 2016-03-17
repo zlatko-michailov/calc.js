@@ -40,9 +40,9 @@ export class Tests {
         let passed: boolean = true;
         
         array.push(
-            Lib_Global.cr(21, 32, 4),
-            Lib_Global.cr(43, 54, 5),
-            Lib_Global.cr(65, 76, 6)
+            Lib_Global.Global.cr(21, 32, 4),
+            Lib_Global.Global.cr(43, 54, 5),
+            Lib_Global.Global.cr(65, 76, 6)
         )
         
         let helper: () => void = () => {
@@ -63,27 +63,29 @@ export class Tests {
     static testParseCellInput() : boolean {
         let app: Platform_App.App = new Platform_App.App();
         Platform_App.App.currentApp = app;
+        Lib_Global.Global.ensure();
+        
         let passed: boolean = true;
         
-        let ref : Platform_Ref.CellRef = Lib_Global.cr(12, 34, 9); 
+        let ref : Platform_Ref.CellRef = Lib_Global.Global.cr(12, 34, 9); 
         app.parseCellInput(ref, "42");
         let val: any = app.getCell(ref).value;
         passed = Test_Main.Framework.areEqual("number", typeof val, Test_Main.LogLevel.Info, "typeof 42") && passed;
         passed = Test_Main.Framework.areEqual(42, val, Test_Main.LogLevel.Info, "42") && passed;
         
-        ref = Lib_Global.cr(23, 45, 9); 
+        ref = Lib_Global.Global.cr(23, 45, 9); 
         app.parseCellInput(ref, "'foo'");
         val = app.getCell(ref).value;
         passed = Test_Main.Framework.areEqual("string", typeof val, Test_Main.LogLevel.Info, "typeof 'foo'") && passed;
         passed = Test_Main.Framework.areEqual("foo", val, Test_Main.LogLevel.Info, "'foo'") && passed;
         
-        ref = Lib_Global.cr(34, 56, 9); 
+        ref = Lib_Global.Global.cr(34, 56, 9); 
         app.parseCellInput(ref, "[23, 34, 45]");
         val = app.getCell(ref).value;
         passed = Test_Main.Framework.areEqual("object", typeof val, Test_Main.LogLevel.Info, "typeof [23, 34, 45]") && passed;
         passed = Test_Main.Framework.areEqual(JSON.stringify([23, 34, 45]), JSON.stringify(val), Test_Main.LogLevel.Info, "[23, 34, 45]") && passed;
 
-        ref = Lib_Global.cr(45, 67, 9); 
+        ref = Lib_Global.Global.cr(45, 67, 9); 
         app.parseCellInput(ref, "{ a: 43, b: 'bar' }");
         val = app.getCell(ref).value;
         passed = Test_Main.Framework.areEqual("object", typeof val, Test_Main.LogLevel.Info, "typeof { a: 43, b: 'bar' }") && passed;
@@ -92,20 +94,20 @@ export class Tests {
         let json : string = Util_JSON.Serializer.toJSON(app);
         // TODO: Verify whole app
 
-        ref = Lib_Global.cr(12, 34, 9); 
+        ref = Lib_Global.Global.cr(12, 34, 9); 
         app.parseCellInput(ref, "new Date(2016, 3, 9, 21, 2, 12)");
         val = app.getCell(ref).value;
         passed = Test_Main.Framework.areEqual("object", typeof val, Test_Main.LogLevel.Info, "typeof new Date(2016, 3, 9, 21, 2, 12)") && passed;
         passed = Test_Main.Framework.areEqual(JSON.stringify(new Date(2016, 3, 9, 21, 2, 12)), JSON.stringify(val), Test_Main.LogLevel.Info, "new Date(2016, 3, 9, 21, 2, 12)") && passed;
         
-        ref = Lib_Global.cr(23, 45, 9); 
+        ref = Lib_Global.Global.cr(23, 45, 9); 
         app.parseCellInput(ref, "=56 + 78");
         val = app.getCell(ref).formula();
         passed = Test_Main.Framework.areEqual("function", typeof app.getCell(ref).formula, Test_Main.LogLevel.Info, "typeof =56 + 78") && passed;
         passed = Test_Main.Framework.areEqual("number", typeof val, Test_Main.LogLevel.Info, "typeof 56 + 78") && passed;
         passed = Test_Main.Framework.areEqual(56 + 78, val, Test_Main.LogLevel.Info, "=56 + 78") && passed;
 
-        ref = Lib_Global.cr(34, 56, 9); 
+        ref = Lib_Global.Global.cr(34, 56, 9); 
         app.parseCellInput(ref, "=function () { return 'abcd'.length; }");
         val = app.getCell(ref).formula();
         let valval = val();
@@ -114,13 +116,7 @@ export class Tests {
         passed = Test_Main.Framework.areEqual("number", typeof valval, Test_Main.LogLevel.Info, "typeof (function() { return 'abcd'.length; })()") && passed;
         passed = Test_Main.Framework.areEqual("abcd".length, valval, Test_Main.LogLevel.Info, "(function() { return 'abcd'.length; })()") && passed;
         
-        // TODO:
-        let ev = "var CalcJS_Lib_Global = require('../../lib/global'); ";
-        ev += "global.value = function(cellRef) { return CalcJS_Lib_Global.value(cellRef); }; ";
-        ev += "global.cr = function(c, r, s) { return CalcJS_Lib_Global.cr(c, r, s); }; ";
-        eval(ev);
-
-        ref = Lib_Global.cr(45, 67, 9); 
+        ref = Lib_Global.Global.cr(45, 67, 9); 
         app.parseCellInput(ref, "=value(cr(23, 45, 9)) + value(cr(34, 56, 9))()");
         val = app.getCell(ref).formula();
         passed = Test_Main.Framework.areEqual("function", typeof app.getCell(ref).formula, Test_Main.LogLevel.Info, "typeof =value(cr(23, 45)) + value(cr(34, 56))()") && passed;
