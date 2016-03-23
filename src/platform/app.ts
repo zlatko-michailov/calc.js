@@ -34,15 +34,51 @@ export class App {
     sessionState: AppSessionState = new AppSessionState(); 
     sheets: StorageArray<Sheet> = new StorageArray<Sheet>(() => new Sheet());
     
-    getCellValue(cellRef: Platform_Ref.CellRef) : any {
-        return this.usingCell(cellRef, () => this.getCurrentCellValue());
-    }
-    
     parseCellInput(cellRef: Platform_Ref.CellRef, input?: string) : void {
-        this.usingCell(cellRef, () => this.parseCurrentCellInput(input));
+        if (cellRef.sheetRef === undefined) {
+            throw new Util_Errors.Exception(Util_Errors.ErrorCode.InvalidArgument, "The cellRef must be fully qualified, i.e. sheetRef must be set.");
+        }
+        
+        let cell: Cell = this.getCell(cellRef);
+        cell.reset(cellRef);
+        
+        cell.input = input;
+        
+        if (input != undefined) {
+            // Check if the input is a formula.        
+            input = input.trim();
+            if (input.charAt(0) === "=") {
+                let formulaBody = input.substring(1);
+                try {
+                    cell.formula = new Function("return ".concat(formulaBody));
+                }
+                catch (ex) {
+                    cell.reset();
+                    throw new Util_Errors.Exception(Util_Errors.ErrorCode.InvalidArgument, "Invalid formula.");
+                }
+            }
+            else {
+                // eval() throws on object literals. So make them explicit. 
+                if (input.charAt(0) === "{" && input.charAt(input.length - 1) === "}") {
+                    input = "new Object(" + input + ")";
+                }
+                
+                try {
+                    // Try to evaluate the input to get the actual type.
+                    cell.value = eval(input);
+                }
+                catch(ex) {
+                    // If evaluation fails, treat the user input as a string literal. 
+                    cell.value = input;
+                }
+            }
+        }
+        
+        // Recalc this cell and its consumers.
+        this.recalcCell(cell);
     }
     
-   usingCell(cellRef: Platform_Ref.CellRef, action: () => any) : any {
+    getCellValue(cellRef: Platform_Ref.CellRef) : any {
         // Make sure all CellRef's in the stack are fully initialized.
         if (cellRef.sheetRef === undefined) {
             let currentCellRef: Platform_Ref.CellRef = this.sessionState.currentCellStack.peek();
@@ -62,7 +98,7 @@ export class App {
         cell.sessionState.isUnderCalc = true;
         this.sessionState.currentCellStack.push(cellRef);
         try {
-            return action();
+            return cell.value;
         }
         finally {
            this.sessionState.currentCellStack.pop();
@@ -70,61 +106,9 @@ export class App {
         }
     }
     
-    getCurrentCellValue() : any {
-        let currentCell: Cell = this.getCurrentCell();
-        
-        // TODO: Invoke only if necessary.
-        if (currentCell.formula != undefined) {
-            currentCell.sessionState.lastCalcRunId = this.sessionState.currentCalcRunId;
-            try {
-                currentCell.value = currentCell.formula();
-            }
-            catch (ex) {
-                throw new Util_Errors.Exception(Util_Errors.ErrorCode.InvalidFormula, currentCell.input);
-            }
-        }
-        
-        return currentCell.value;
-    }
-    
-    parseCurrentCellInput(input?: string) : void {
-        let currentCell: Cell = this.getCurrentCell();
-        currentCell.reset();
-        
-        currentCell.input = input;
-        
-        if (input != undefined) {
-            // Check if the user input is a formula.        
-            input = input.trim();
-            if (input.charAt(0) === "=") {
-                let formulaBody = input.substring(1);
-                try {
-                    currentCell.formula = new Function("return ".concat(formulaBody));
-                }
-                catch (ex) {
-                    currentCell.reset();
-                    throw new Util_Errors.Exception(Util_Errors.ErrorCode.InvalidArgument, "Invalid formula.");
-                }
-            }
-            else {
-                // eval() throws on object literals. So make them explicit. 
-                if (input.charAt(0) === "{" && input.charAt(input.length - 1) === "}") {
-                    input = "new Object(" + input + ")";
-                }
-                
-                try {
-                    // Try to evaluate the input to get the actual type.
-                    currentCell.value = eval(input);
-                }
-                catch(ex) {
-                    // If evaluation fails, treat the user input as a string literal. 
-                    currentCell.value = input;
-                }
-            }
-        }
-        
-        // Recalc this cell and its consumers.
-        currentCell.recalc();
+    recalcCell(cell: Cell) {
+        this.sessionState.currentCalcRunId++;
+        cell.recalc();
     }
     
     getCurrentCell() : Cell {
@@ -159,9 +143,9 @@ export class Column {
     cells: StorageArray<Cell> = new StorageArray<Cell>(() => new Cell());
 }
 
-
 export class Cell {
     sessionState: CellSessionState;
+    ref: Platform_Ref.CellRef;
     input: string;
     formula: Function;
     value: any;
@@ -170,20 +154,39 @@ export class Cell {
         this.reset();
     }
     
-    reset() : void {
+    reset(ref?: Platform_Ref.CellRef) : void {
+        this.ref = ref;
         this.input = undefined;
         this.formula = undefined;
         this.value = undefined;
         if (this.sessionState === undefined) {
-            this.sessionState = new CellSessionState();
+            this.sessionState = new CellSessionState(ref);
         }
         else {
-            this.sessionState.reset();
+            this.sessionState.reset(ref);
         }
     }
     
     recalc() : void {
-        // TODO
+        let app = App.currentApp;
+        
+        if (this.sessionState.lastCalcRunId < app.sessionState.currentCalcRunId) {
+            this.sessionState.lastCalcRunId = app.sessionState.currentCalcRunId;
+            
+            if (this.formula != undefined) {
+                try {
+                    this.value = this.formula();
+                    
+                    // Recalc each consumer cell.
+                    for (let i in this.sessionState.consumerCellRefs) {
+                        app.getCell(this.sessionState.consumerCellRefs[i]).recalc();
+                    }
+                }
+                catch (ex) {
+                    throw new Util_Errors.Exception(Util_Errors.ErrorCode.InvalidFormula, this.input);
+                }
+            }
+        }
     }
 }
 
@@ -204,20 +207,42 @@ class AppSessionState {
 
 
 class CellSessionState {
+    cellRef: Platform_Ref.CellRef;
     isUnderCalc : boolean;
     lastCalcRunId: number;
-    providerCells: Array<Platform_Ref.CellRef>; 
-    consumerCells: Array<Platform_Ref.CellRef>;
+    providerCellRefs: Util_Arrays.SparseArray<Platform_Ref.CellRef>; 
+    consumerCellRefs: Util_Arrays.SparseArray<Platform_Ref.CellRef>;
     
-    constructor() {
-        this.reset();
+    constructor(cellRef: Platform_Ref.CellRef) {
+        this.reset(cellRef);
     } 
     
-    reset() : void {
+    reset(cellRef: Platform_Ref.CellRef) : void {
+        this.cellRef = cellRef;
         this.lastCalcRunId = 0;
-        this.providerCells = new Array<Platform_Ref.CellRef>();
-        if (this.consumerCells === undefined) {
-            this.consumerCells = new Array<Platform_Ref.CellRef>();
+        
+        if (this.providerCellRefs === undefined) {
+            this.providerCellRefs = new Array<Platform_Ref.CellRef>();
+        }
+        else {
+            let app = App.currentApp;
+            
+            // Remove this cell from each provider before removing the provider.
+            for (let i in this.providerCellRefs) {
+                let providerCell = app.getCell(this.providerCellRefs[i]);
+                let consumerCellRefs: Util_Arrays.SparseArray<Platform_Ref.CellRef> = providerCell.sessionState.consumerCellRefs;
+                let consumerIndex: number = consumerCellRefs.indexOf(this.cellRef); 
+                if (consumerIndex != undefined) {
+                    delete consumerCellRefs[consumerIndex];
+                }
+                
+                delete this.providerCellRefs[i];
+            }
+        }
+        
+        // Keep the consumers if the collection has been initialized.
+        if (this.consumerCellRefs === undefined) {
+            this.consumerCellRefs = new Array<Platform_Ref.CellRef>();
         }
     }
 }

@@ -39,6 +39,16 @@ export class Stack<T> extends Array<T> {
 
 export class SparseArray<T> {
     [index: number]: T;
+    
+    indexOf(value: T) : number {
+        for (let i in this) {
+            if (this[i] == value) {
+                return parseInt(i);
+            }
+        }
+        
+        return undefined;
+    }
 }
 
 

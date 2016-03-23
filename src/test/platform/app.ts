@@ -33,33 +33,6 @@ import * as Test_Main from "../main";
 
 
 export class Tests {
-    static testUsingCell(): boolean {
-        let app: Platform_App.App = new Platform_App.App();
-        Platform_App.App.currentApp = app;
-        let array: Platform_Ref.CellRef[] = new Array<Platform_Ref.CellRef>();
-        let passed: boolean = true;
-        
-        array.push(
-            Lib_Global.Global.cr(21, 32, 4),
-            Lib_Global.Global.cr(43, 54, 5),
-            Lib_Global.Global.cr(65, 76, 6)
-        )
-        
-        let helper: () => void = () => {
-            let ref: Platform_Ref.CellRef = array.pop();
-            if (ref) {
-                app.usingCell(ref, () => {
-                    passed = Test_Main.Framework.areEqual(JSON.stringify(ref), JSON.stringify(app.sessionState.currentCellStack.peek()), Test_Main.LogLevel.Info, "before") && passed;
-                    helper();
-                    passed = Test_Main.Framework.areEqual(JSON.stringify(ref), JSON.stringify(app.sessionState.currentCellStack.peek()), Test_Main.LogLevel.Info, "after") && passed;
-                });
-            }
-        };
-        helper();
-        
-        return passed;
-    }
-    
     static testParseCellInput() : boolean {
         let app: Platform_App.App = new Platform_App.App();
         Platform_App.App.currentApp = app;
