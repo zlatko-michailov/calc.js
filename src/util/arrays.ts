@@ -49,6 +49,17 @@ export class SparseArray<T> {
         
         return undefined;
     }
+    
+    insert(value: T) : number {
+        for (let i: number = 0; i < Number.MAX_VALUE; i++) {
+            if (this[i] === undefined) {
+                this[i] = value;
+                return i;
+            }
+        }
+        
+        throw new Util_Errors.Exception(Util_Errors.ErrorCode.IndexOutOfRange, "Cannot insert a new value because this SparseArray is completely full.");
+    }
 }
 
 
