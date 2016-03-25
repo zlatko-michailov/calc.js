@@ -60,6 +60,15 @@ export class SparseArray<T> {
         
         throw new Util_Errors.Exception(Util_Errors.ErrorCode.IndexOutOfRange, "Cannot insert a new value because this SparseArray is completely full.");
     }
+    
+    forEach(callback: (i: number) => void) : void {
+        for (let s in this) {
+            let i = parseInt(s);
+            if (!isNaN(i)) {
+                callback(i);
+            }
+        }
+    }
 }
 
 

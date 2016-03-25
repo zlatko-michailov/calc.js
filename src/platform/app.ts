@@ -187,16 +187,16 @@ export class Cell {
                         app.sessionState.currentCellStack.pop();
                         this.sessionState.isUnderCalc = false; 
                     }
-                    
-                    // Recalc each consumer cell.
-                    for (let i in this.sessionState.consumerCellRefs) {
-                        app.getCell(this.sessionState.consumerCellRefs[i]).recalc();
-                    }
                 }
                 catch (ex) {
                     throw new Util_Errors.Exception(Util_Errors.ErrorCode.InvalidFormula, this.input);
                 }
             }
+                    
+            // Recalc each consumer cell.
+            this.sessionState.consumerCellRefs.forEach(i => {
+                app.getCell(this.sessionState.consumerCellRefs[i]).recalc();
+            });
         }
     }
 }
@@ -239,7 +239,7 @@ class CellSessionState {
             let app = App.currentApp;
             
             // Remove this cell from each provider before removing the provider.
-            for (let i in this.providerCellRefs) {
+            this.providerCellRefs.forEach(i => {
                 let providerCell = app.getCell(this.providerCellRefs[i]);
                 let consumerCellRefs: Util_Arrays.SparseArray<Platform_Ref.CellRef> = providerCell.sessionState.consumerCellRefs;
                 let consumerIndex: number = consumerCellRefs.indexOf(this.cellRef); 
@@ -248,7 +248,7 @@ class CellSessionState {
                 }
                 
                 delete this.providerCellRefs[i];
-            }
+            });
         }
         
         // Keep the consumers if the collection has been initialized.

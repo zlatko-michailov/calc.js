@@ -62,11 +62,9 @@ export class Tests {
         
         delete array[99];
         passed = Test_Main.Framework.isUndefined(array[99], Test_Main.LogLevel.Info, "deleted") && passed;
-        for (let index in array) {
-            if (typeof array[index] != "function") {
-                passed = Test_Main.Framework.areEqual('2016', index, Test_Main.LogLevel.Info, "for") && passed;
-            }
-        }
+        array.forEach(i => {
+            passed = Test_Main.Framework.areEqual('2016', i.toString(), Test_Main.LogLevel.Info, "for") && passed;
+        });
         
         return passed;
     }
