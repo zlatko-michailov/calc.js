@@ -39,7 +39,11 @@ export class App {
             throw new Util_Errors.Exception(Util_Errors.ErrorCode.InvalidArgument, "The cellRef must be fully qualified, i.e. sheetRef must be set.");
         }
         
-        let cell: Cell = this.getCell(cellRef);
+        // Make sure the cell exists.
+        let cell: Cell = this.ensureCell(cellRef);
+        
+        // Each cell must keep its own ref by ID.
+        cellRef = this.makeCellRefById(cellRef);
         cell.reset(cellRef);
         
         cell.input = input;
@@ -89,14 +93,14 @@ export class App {
             cellRef.sheetRef = currentCellRef.sheetRef;
         }
 
-        let cell: Cell = this.getCell(cellRef);
+        let cell: Cell = this.ensureCell(cellRef);
         
         // Add the direct consumer to the consumers list.
         let consumerCellRef: Platform_Ref.CellRef = this.sessionState.currentCellStack.peek(); 
         if (consumerCellRef != undefined) {
              cell.sessionState.consumerCellRefs.insert(consumerCellRef);
              
-             let consumerCell: Cell = this.getCell(consumerCellRef);
+             let consumerCell: Cell = this.ensureCell(consumerCellRef);
              consumerCell.sessionState.providerCellRefs.insert(cell.ref);
         }
         
@@ -114,19 +118,40 @@ export class App {
             return undefined;
         }
         
-        return this.getCell(currentCellRef);
+        return this.ensureCell(currentCellRef);
     }
         
     getCurrentCellRef() : Platform_Ref.CellRef {
         return this.sessionState.currentCellStack.peek();
     }
         
-    getCell(cellRef: Platform_Ref.CellRef) : Cell {
+    ensureCell(cellRef: Platform_Ref.CellRef) : Cell {
         let sheet: Sheet = this.sheets.getByRefUnit(cellRef.sheetRef);
         let column: Column = sheet.columns.getByRefUnit(cellRef.columnRef);
         let cell: Cell = column.cells.getByRefUnit(cellRef.rowRef);
         
         return cell;
+    }
+    
+    makeCellRefById(cellRef: Platform_Ref.CellRef) : Platform_Ref.CellRef {
+        let sheetId: number = cellRef.sheetRef.kind == Platform_Ref.RefKind.ById 
+                                    ? cellRef.sheetRef.value 
+                                    : this.sheets.getId(cellRef.sheetRef.value);
+        let sheet: Sheet = this.sheets.getById(sheetId);
+         
+        let columnId: number = cellRef.columnRef.kind == Platform_Ref.RefKind.ById 
+                                    ? cellRef.columnRef.value 
+                                    : sheet.columns.getId(cellRef.columnRef.value);
+        let column: Column = sheet.columns.getById(columnId);
+        
+        let rowId: number = cellRef.rowRef.kind == Platform_Ref.RefKind.ById 
+                                    ? cellRef.rowRef.value 
+                                    : column.cells.getId(cellRef.rowRef.value);
+
+        return new Platform_Ref.CellRef(
+                    new Platform_Ref.RefUnit(Platform_Ref.RefKind.ById, columnId), 
+                    new Platform_Ref.RefUnit(Platform_Ref.RefKind.ById, rowId), 
+                    new Platform_Ref.RefUnit(Platform_Ref.RefKind.ById, sheetId));
     }
 }
 
@@ -195,7 +220,7 @@ export class Cell {
                     
             // Recalc each consumer cell.
             this.sessionState.consumerCellRefs.forEach(i => {
-                app.getCell(this.sessionState.consumerCellRefs[i]).recalc();
+                app.ensureCell(this.sessionState.consumerCellRefs[i]).recalc();
             });
         }
     }
@@ -240,7 +265,7 @@ class CellSessionState {
             
             // Remove this cell from each provider before removing the provider.
             this.providerCellRefs.forEach(i => {
-                let providerCell = app.getCell(this.providerCellRefs[i]);
+                let providerCell = app.ensureCell(this.providerCellRefs[i]);
                 let consumerCellRefs: Util_Arrays.SparseArray<Platform_Ref.CellRef> = providerCell.sessionState.consumerCellRefs;
                 let consumerIndex: number = consumerCellRefs.indexOf(this.cellRef); 
                 if (consumerIndex != undefined) {
