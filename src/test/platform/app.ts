@@ -138,6 +138,8 @@ export class Tests {
         passed = Test_Main.Framework.areEqual("number", typeof val, Test_Main.LogLevel.Info, "typeof 14") && passed;
         passed = Test_Main.Framework.areEqual(14, val, Test_Main.LogLevel.Info, "14") && passed;
         
+        // TODO: Add circular dependency here.
+        
         return passed;
     }
 }

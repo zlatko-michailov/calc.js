@@ -98,10 +98,10 @@ export class App {
         // Add the direct consumer to the consumers list.
         let consumerCellRef: Platform_Ref.CellRef = this.sessionState.currentCellStack.peek(); 
         if (consumerCellRef != undefined) {
-             cell.sessionState.consumerCellRefs.insert(consumerCellRef);
+             cell.consumerCellRefs.insert(consumerCellRef);
              
              let consumerCell: Cell = this.ensureCell(consumerCellRef);
-             consumerCell.sessionState.providerCellRefs.insert(cell.ref);
+             consumerCell.providerCellRefs.insert(cell.ref);
         }
         
         return cell.value;
@@ -166,11 +166,13 @@ export class Column {
 }
 
 export class Cell {
-    sessionState: CellSessionState;
     ref: Platform_Ref.CellRef;
     input: string;
     formula: Function;
     value: any;
+    providerCellRefs: Util_Arrays.SparseArray<Platform_Ref.CellRef>; 
+    consumerCellRefs: Util_Arrays.SparseArray<Platform_Ref.CellRef>;
+    sessionState: CellSessionState;
     
     constructor() {
         this.reset();
@@ -181,11 +183,36 @@ export class Cell {
         this.input = undefined;
         this.formula = undefined;
         this.value = undefined;
-        if (this.sessionState === undefined) {
-            this.sessionState = new CellSessionState(ref);
+        
+        if (this.providerCellRefs === undefined) {
+            this.providerCellRefs = new Util_Arrays.SparseArray<Platform_Ref.CellRef>();
         }
         else {
-            this.sessionState.reset(ref);
+            let app = App.currentApp;
+            
+            // Remove this cell from each provider before removing the provider.
+            this.providerCellRefs.forEach(i => {
+                let providerCell = app.ensureCell(this.providerCellRefs[i]);
+                let consumerCellRefs: Util_Arrays.SparseArray<Platform_Ref.CellRef> = providerCell.consumerCellRefs;
+                let consumerIndex: number = consumerCellRefs.indexOf(this.ref); 
+                if (consumerIndex != undefined) {
+                    delete consumerCellRefs[consumerIndex];
+                }
+                
+                delete this.providerCellRefs[i];
+            });
+        }
+        
+        // Keep the consumers if the collection has been initialized.
+        if (this.consumerCellRefs === undefined) {
+            this.consumerCellRefs = new Util_Arrays.SparseArray<Platform_Ref.CellRef>();
+        }
+        
+        if (this.sessionState === undefined) {
+            this.sessionState = new CellSessionState();
+        }
+        else {
+            this.sessionState.reset();
         }
     }
     
@@ -219,8 +246,8 @@ export class Cell {
             }
                     
             // Recalc each consumer cell.
-            this.sessionState.consumerCellRefs.forEach(i => {
-                app.ensureCell(this.sessionState.consumerCellRefs[i]).recalc();
+            this.consumerCellRefs.forEach(i => {
+                app.ensureCell(this.consumerCellRefs[i]).recalc();
             });
         }
     }
@@ -243,43 +270,16 @@ class AppSessionState {
 
 
 class CellSessionState {
-    cellRef: Platform_Ref.CellRef;
     isUnderCalc : boolean;
     lastCalcRunId: number;
-    providerCellRefs: Util_Arrays.SparseArray<Platform_Ref.CellRef>; 
-    consumerCellRefs: Util_Arrays.SparseArray<Platform_Ref.CellRef>;
     
-    constructor(cellRef: Platform_Ref.CellRef) {
-        this.reset(cellRef);
+    constructor() {
+        this.reset();
     } 
     
-    reset(cellRef: Platform_Ref.CellRef) : void {
-        this.cellRef = cellRef;
+    reset() : void {
+        this.isUnderCalc = false;
         this.lastCalcRunId = 0;
-        
-        if (this.providerCellRefs === undefined) {
-            this.providerCellRefs = new Util_Arrays.SparseArray<Platform_Ref.CellRef>();
-        }
-        else {
-            let app = App.currentApp;
-            
-            // Remove this cell from each provider before removing the provider.
-            this.providerCellRefs.forEach(i => {
-                let providerCell = app.ensureCell(this.providerCellRefs[i]);
-                let consumerCellRefs: Util_Arrays.SparseArray<Platform_Ref.CellRef> = providerCell.sessionState.consumerCellRefs;
-                let consumerIndex: number = consumerCellRefs.indexOf(this.cellRef); 
-                if (consumerIndex != undefined) {
-                    delete consumerCellRefs[consumerIndex];
-                }
-                
-                delete this.providerCellRefs[i];
-            });
-        }
-        
-        // Keep the consumers if the collection has been initialized.
-        if (this.consumerCellRefs === undefined) {
-            this.consumerCellRefs = new Util_Arrays.SparseArray<Platform_Ref.CellRef>();
-        }
     }
 }
 
