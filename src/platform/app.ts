@@ -78,8 +78,8 @@ export class App {
             }
         }
         
-        // Recalc this cell and its consumers.
-        this.recalcCell(cell);
+        // Recalc the cell and its consumers.
+        cell.recalc();
     }
     
     getCellValue(cellRef: Platform_Ref.CellRef) : any {
@@ -108,7 +108,6 @@ export class App {
     }
     
     recalcCell(cell: Cell) {
-        this.sessionState.currentCalcRunId++;
         cell.recalc();
     }
     
@@ -217,26 +216,18 @@ export class Cell {
     }
     
     recalc() : void {
-        let app = App.currentApp;
-        
-        if (this.sessionState.lastCalcRunId < app.sessionState.currentCalcRunId) {
-            this.sessionState.lastCalcRunId = app.sessionState.currentCalcRunId;
-
-            // Recalc this value.
-            this.recalcValue();            
-                    
-            // Recalc each consumer cell.
-            this.consumerCellRefs.forEach(i => {
-                app.ensureCell(this.consumerCellRefs[i]).recalc();
-            });
-        }
+        // Recalc this value.
+        this.recalcValue();            
+                
+        // Recalc each consumer cell.
+        this.consumerCellRefs.forEach(i => {
+            App.currentApp.ensureCell(this.consumerCellRefs[i]).recalc();
+        });
     }
     
     getValue() : any {
-        let app = App.currentApp;
-
         // If there is an active recalc, recalc this value.
-        if (app.sessionState.calcStack.length > 0) {
+        if (App.currentApp.sessionState.calcStack.length > 0) {
             this.recalcValue();
         }
         
@@ -262,8 +253,6 @@ export class Cell {
     }
     
     executeStackOperation(operation: () => any) : any {
-        let app = App.currentApp;
-
         // This cell must not be already under calc.
         if (this.sessionState.isUnderCalc) {
             throw new Util_Errors.Exception(Util_Errors.ErrorCode.CircularReference, Util_JSON.Serializer.toJSON(this));
@@ -272,13 +261,13 @@ export class Cell {
         try {
             // Push this cell into the stack.
             this.sessionState.isUnderCalc = true;
-            app.sessionState.calcStack.push(this.ref);
+            App.currentApp.sessionState.calcStack.push(this.ref);
             
             return operation();
         }
         finally {
             // Pop this cell out of the stack.
-            app.sessionState.calcStack.pop();
+            App.currentApp.sessionState.calcStack.pop();
             this.sessionState.isUnderCalc = false; 
         }
     }
@@ -287,7 +276,6 @@ export class Cell {
 
 class AppSessionState {
     calcStack: Util_Arrays.Stack<Platform_Ref.CellRef>;
-    currentCalcRunId: number;
     
     constructor() {
         this.reset();
@@ -295,14 +283,12 @@ class AppSessionState {
     
     reset() : void {
         this.calcStack = new Util_Arrays.Stack<Platform_Ref.CellRef>();
-        this.currentCalcRunId = 0;
     }
 }
 
 
 class CellSessionState {
     isUnderCalc : boolean;
-    lastCalcRunId: number;
     
     constructor() {
         this.reset();
@@ -310,7 +296,6 @@ class CellSessionState {
     
     reset() : void {
         this.isUnderCalc = false;
-        this.lastCalcRunId = 0;
     }
 }
 
