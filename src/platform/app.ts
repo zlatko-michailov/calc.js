@@ -45,41 +45,8 @@ export class App {
         // Each cell must keep its own ref by ID.
         cellRef = this.makeCellRefById(cellRef);
         cell.reset(cellRef);
-        
-        cell.input = input;
-        
-        if (input != undefined) {
-            // Check if the input is a formula.        
-            input = input.trim();
-            if (input.charAt(0) === "=") {
-                let formulaBody = input.substring(1);
-                try {
-                    cell.formula = new Function("return ".concat(formulaBody));
-                }
-                catch (ex) {
-                    cell.reset();
-                    throw new Util_Errors.Exception(Util_Errors.ErrorCode.InvalidArgument, "Invalid formula.");
-                }
-            }
-            else {
-                // eval() throws on object literals. So make them explicit. 
-                if (input.charAt(0) === "{" && input.charAt(input.length - 1) === "}") {
-                    input = "new Object(" + input + ")";
-                }
-                
-                try {
-                    // Try to evaluate the input to get the actual type.
-                    cell.value = eval(input);
-                }
-                catch(ex) {
-                    // If evaluation fails, treat the user input as a string literal. 
-                    cell.value = input;
-                }
-            }
-        }
-        
-        // Recalc the cell and its consumers.
-        cell.recalc();
+
+        cell.parseInput(input);
     }
     
     getCellValue(cellRef: Platform_Ref.CellRef) : any {
@@ -94,36 +61,9 @@ export class App {
         }
 
         let cell: Cell = this.ensureCell(cellRef);
-        
-        // Add the direct consumer to the consumers list.
-        let consumerCellRef: Platform_Ref.CellRef = this.sessionState.calcStack.peek(); 
-        if (consumerCellRef != undefined) {
-             cell.consumerCellRefs.insert(consumerCellRef);
-             
-             let consumerCell: Cell = this.ensureCell(consumerCellRef);
-             consumerCell.providerCellRefs.insert(cell.ref);
-        }
-        
         return cell.getValue();
     }
     
-    recalcCell(cell: Cell) {
-        cell.recalc();
-    }
-    
-    getCurrentCell() : Cell {
-        let currentCellRef: Platform_Ref.CellRef = this.getCurrentCellRef();
-        if (currentCellRef === undefined) {
-            return undefined;
-        }
-        
-        return this.ensureCell(currentCellRef);
-    }
-        
-    getCurrentCellRef() : Platform_Ref.CellRef {
-        return this.sessionState.calcStack.peek();
-    }
-        
     ensureCell(cellRef: Platform_Ref.CellRef) : Cell {
         let sheet: Sheet = this.sheets.getByRefUnit(cellRef.sheetRef);
         let column: Column = sheet.columns.getByRefUnit(cellRef.columnRef);
@@ -215,6 +155,43 @@ export class Cell {
         }
     }
     
+    parseInput(input?: string) : void {
+        this.input = input;
+        
+        if (input != undefined) {
+            // Check if the input is a formula.        
+            input = input.trim();
+            if (input.charAt(0) === "=") {
+                let formulaBody = input.substring(1);
+                try {
+                    this.formula = new Function("return ".concat(formulaBody));
+                }
+                catch (ex) {
+                    this.reset();
+                    throw new Util_Errors.Exception(Util_Errors.ErrorCode.InvalidArgument, "Invalid formula.");
+                }
+            }
+            else {
+                // eval() throws on object literals. So make them explicit. 
+                if (input.charAt(0) === "{" && input.charAt(input.length - 1) === "}") {
+                    input = "new Object(" + input + ")";
+                }
+                
+                try {
+                    // Try to evaluate the input to get the actual type.
+                    this.value = eval(input);
+                }
+                catch(ex) {
+                    // If evaluation fails, treat the user input as a string literal. 
+                    this.value = input;
+                }
+            }
+        }
+        
+        // Recalc this cell and its consumers.
+        this.recalc();
+    }
+    
     recalc() : void {
         // Recalc this value.
         this.recalcValue();            
@@ -226,8 +203,19 @@ export class Cell {
     }
     
     getValue() : any {
-        // If there is an active recalc, recalc this value.
+        // If there is an active recalc, update the dependency graph and recalc the value.
         if (App.currentApp.sessionState.calcStack.length > 0) {
+            let app: App = App.currentApp;
+            
+            // Add the direct consumer to this cell's consumers list.
+            let consumerCellRef: Platform_Ref.CellRef = app.sessionState.calcStack.peek(); 
+            this.consumerCellRefs.insert(consumerCellRef);
+            
+            // Add this cell to the consumer's provider list.
+            let consumerCell: Cell = app.ensureCell(consumerCellRef);
+            consumerCell.providerCellRefs.insert(this.ref);
+
+            // Recalc the value.
             this.recalcValue();
         }
         
