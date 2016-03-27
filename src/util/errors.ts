@@ -31,6 +31,12 @@ export class Exception {
         this.code = code;
         this.message = message;
     }
+    
+    static isException(ex: any) : boolean {
+        return typeof ex == "object"
+                && typeof ex.code == "number"
+                && typeof ex.message == "string";
+    }
 }
 
 

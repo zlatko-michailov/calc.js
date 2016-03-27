@@ -85,7 +85,7 @@ export class App {
     getCellValue(cellRef: Platform_Ref.CellRef) : any {
         // Make sure all CellRef's in the stack are fully initialized.
         if (cellRef.sheetRef === undefined) {
-            let currentCellRef: Platform_Ref.CellRef = this.sessionState.currentCellStack.peek();
+            let currentCellRef: Platform_Ref.CellRef = this.sessionState.calcStack.peek();
             if (currentCellRef === undefined) {
                 throw new Util_Errors.Exception(Util_Errors.ErrorCode.InvalidArgument, "The first cell to be calculated must be fully identified.");
             }
@@ -96,7 +96,7 @@ export class App {
         let cell: Cell = this.ensureCell(cellRef);
         
         // Add the direct consumer to the consumers list.
-        let consumerCellRef: Platform_Ref.CellRef = this.sessionState.currentCellStack.peek(); 
+        let consumerCellRef: Platform_Ref.CellRef = this.sessionState.calcStack.peek(); 
         if (consumerCellRef != undefined) {
              cell.consumerCellRefs.insert(consumerCellRef);
              
@@ -104,7 +104,7 @@ export class App {
              consumerCell.providerCellRefs.insert(cell.ref);
         }
         
-        return cell.value;
+        return cell.getValue();
     }
     
     recalcCell(cell: Cell) {
@@ -122,7 +122,7 @@ export class App {
     }
         
     getCurrentCellRef() : Platform_Ref.CellRef {
-        return this.sessionState.currentCellStack.peek();
+        return this.sessionState.calcStack.peek();
     }
         
     ensureCell(cellRef: Platform_Ref.CellRef) : Cell {
@@ -221,29 +221,9 @@ export class Cell {
         
         if (this.sessionState.lastCalcRunId < app.sessionState.currentCalcRunId) {
             this.sessionState.lastCalcRunId = app.sessionState.currentCalcRunId;
-            
-            // This cell must not be already under calc.
-            if (this.sessionState.isUnderCalc) {
-                throw new Util_Errors.Exception(Util_Errors.ErrorCode.CircularReference, Util_JSON.Serializer.toJSON(this));
-            }
-        
-            if (this.formula != undefined) {
-                try {
-                    // Recalc this cell.
-                    this.sessionState.isUnderCalc = true;
-                    app.sessionState.currentCellStack.push(this.ref);
-                    try {
-                        this.value = this.formula();
-                    }
-                    finally {
-                        app.sessionState.currentCellStack.pop();
-                        this.sessionState.isUnderCalc = false; 
-                    }
-                }
-                catch (ex) {
-                    throw new Util_Errors.Exception(Util_Errors.ErrorCode.InvalidFormula, this.input);
-                }
-            }
+
+            // Recalc this value.
+            this.recalcValue();            
                     
             // Recalc each consumer cell.
             this.consumerCellRefs.forEach(i => {
@@ -251,11 +231,62 @@ export class Cell {
             });
         }
     }
+    
+    getValue() : any {
+        let app = App.currentApp;
+
+        // If there is an active recalc, recalc this value.
+        if (app.sessionState.calcStack.length > 0) {
+            this.recalcValue();
+        }
+        
+        return this.value;
+    }
+    
+    recalcValue() : void {
+        // If this cell has a formula, recalc it.
+        if (this.formula != undefined) {
+            this.executeStackOperation(() => {
+                try {
+                    this.value = this.formula();
+                }
+                catch (ex) {
+                    if (Util_Errors.Exception.isException(ex)) {
+                        throw ex;
+                    }
+                    
+                    throw new Util_Errors.Exception(Util_Errors.ErrorCode.InvalidFormula, this.input);
+                }
+            });
+        }
+    }
+    
+    executeStackOperation(operation: () => any) : any {
+        let app = App.currentApp;
+
+        // This cell must not be already under calc.
+        if (this.sessionState.isUnderCalc) {
+            throw new Util_Errors.Exception(Util_Errors.ErrorCode.CircularReference, Util_JSON.Serializer.toJSON(this));
+        }
+    
+        try {
+            // Push this cell into the stack.
+            this.sessionState.isUnderCalc = true;
+            app.sessionState.calcStack.push(this.ref);
+            
+            return operation();
+        }
+        finally {
+            // Pop this cell out of the stack.
+            app.sessionState.calcStack.pop();
+            this.sessionState.isUnderCalc = false; 
+        }
+    }
 }
 
 
 class AppSessionState {
-    currentCellStack: Util_Arrays.Stack<Platform_Ref.CellRef>;
+    calcStack: Util_Arrays.Stack<Platform_Ref.CellRef>;
     currentCalcRunId: number;
     
     constructor() {
@@ -263,7 +294,7 @@ class AppSessionState {
     }
     
     reset() : void {
-        this.currentCellStack = new Util_Arrays.Stack<Platform_Ref.CellRef>();
+        this.calcStack = new Util_Arrays.Stack<Platform_Ref.CellRef>();
         this.currentCalcRunId = 0;
     }
 }

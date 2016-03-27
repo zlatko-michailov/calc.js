@@ -137,8 +137,9 @@ export class Tests {
         val = app.getCellValue(ref3);
         passed = Test_Main.Framework.areEqual("number", typeof val, Test_Main.LogLevel.Info, "typeof 14") && passed;
         passed = Test_Main.Framework.areEqual(14, val, Test_Main.LogLevel.Info, "14") && passed;
-        
-        // TODO: Add circular dependency here.
+
+        // Circular dependency.
+        passed = Test_Main.Framework.throws(Util_Errors.ErrorCode.CircularReference, () => app.parseCellInput(ref1, "=value(cr(3, 3, 9)) + 1"), Test_Main.LogLevel.Info, "Circular ref");
         
         return passed;
     }
