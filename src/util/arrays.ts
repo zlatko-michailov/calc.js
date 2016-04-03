@@ -122,8 +122,11 @@ export class DualSparseArray<T> {
         }
 
         // Shift back the elements to close the gap.
-        for (let i: number = index; i < this._count - count; i++) {
-            this._byIndex[i] = this._byIndex[i + count]; 
+        for (let i: number = index + count; i < this._count; i++) {
+            let id: number = this._byIndex[i];
+            this._byId[id].index -= count 
+
+            this._byIndex[i - count] = this._byIndex[i]; 
         }
         
         // Trim the elements at the end.
@@ -138,6 +141,8 @@ export class DualSparseArray<T> {
     }
     
     setById(id: number, value: T) : void {
+        // TODO: Remove this method.
+        
         if (this._byId[id] === undefined) {
             this._byId[id] = new IndexValue<T>();
         }
@@ -152,7 +157,7 @@ export class DualSparseArray<T> {
 
     setByIndex(index: number, value: T) : void {
         let id: number = this._byIndex[index];
-        this._byId[id].value = value;
+        this._byId[id] = { index: index, value: value };
     }
 
     getId(index: number) : number {
