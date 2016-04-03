@@ -76,7 +76,7 @@ export class DualSparseArray<T> {
     _count: number = 0;
     _nextId: number = 0;
     _byId: SparseArray<IndexValue<T>> = new SparseArray<IndexValue<T>>();
-    _byIndex: Array<number> = new Array<number>();
+    _byIndex: SparseArray<number> = new SparseArray<number>();
     
     insert(index: number, count?: number) : void {
         if (index < 0 || index > this._count) {
@@ -87,13 +87,13 @@ export class DualSparseArray<T> {
             count = 1;
         }
         
-        // Shift the elements to open a gap.        
-        for (let i: number = this._count - 1; index <= i; i--) {
-            this._byIndex[i + count] = this._byIndex[i];
-            
-            let id: number = this._byIndex[i];
-            this._byId[id].index += count 
-        }
+        // Bump the indeces to open a gap.
+        this._byId.forEach(i => {
+            if (index <= this._byId[i].index) {
+                this._byId[i].index += count;
+                this._byIndex[this._byId[i].index] = i;
+            }
+        });
         
         // Init the elements in the gap.
         for (let i: number = index; i < index + count; i++) {
@@ -114,23 +114,20 @@ export class DualSparseArray<T> {
             count = 1;
         }
         
-        // Delete elements. Open a gap.
+        // Delete elements. Open a gap among the indeces.
         for (let i: number = index; i < index + count; i++) {
             let id: number = this._byIndex[i]; 
             delete this._byId[id];
             delete this._byIndex[i];
         }
 
-        // Shift back the elements to close the gap.
-        for (let i: number = index + count; i < this._count; i++) {
-            let id: number = this._byIndex[i];
-            this._byId[id].index -= count 
-
-            this._byIndex[i - count] = this._byIndex[i]; 
-        }
-        
-        // Trim the elements at the end.
-        this._byIndex.splice(this._count, count);
+        // Shift back the indeces to close the gap.
+        this._byId.forEach(i => {
+            if (index <= this._byId[i].index) {
+                this._byId[i].index -= count;
+                this._byIndex[this._byId[i].index] = i;
+            }
+        });
 
         this._count -= count; 
     }

@@ -121,6 +121,9 @@ export class Tests {
         passed = Test_Main.Framework.areEqual("number", typeof val, Test_Main.LogLevel.Info, "typeof =value(cr(2, 2, 9)) + 6") && passed;
         passed = Test_Main.Framework.areEqual(27, val, Test_Main.LogLevel.Info, "27") && passed;
         
+        // Hook to get a sample app.
+        let sample = Util_JSON.Serializer.toJSON(app);
+        
         // Recalc.
         app.parseCellInput(ref1, "3");
         val = app.getCellValue(ref1);
