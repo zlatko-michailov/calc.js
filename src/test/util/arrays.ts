@@ -74,7 +74,6 @@ export class Tests {
         let passed: boolean = true;
 
         // [ 11, 12 ]        
-        array.insert(0, 2);
         array.setByIndex(0, 11);
         array.setByIndex(1, 12);
         
@@ -85,7 +84,7 @@ export class Tests {
         passed = Test_Main.Framework.areEqual(12, array.getById(1), Test_Main.LogLevel.Info, "by id(1)") && passed;
 
         // [11, 21, 22, 23, 24, 12 ]
-        array.insert(1, 4);
+        array.shiftUp(1, 4);
         array.setByIndex(1, 21);
         array.setByIndex(2, 22);
         array.setByIndex(3, 23);
@@ -106,7 +105,7 @@ export class Tests {
         passed = Test_Main.Framework.areEqual(24, array.getById(5), Test_Main.LogLevel.Info, "by id(5)") && passed;
         
         // [11, 21, 24, 12 ]
-        array.delete(2, 2);
+        array.shiftDown(4, 2);
         
         passed = Test_Main.Framework.areEqual(11, array.getByIndex(0), Test_Main.LogLevel.Info, "by index(0)") && passed;
         passed = Test_Main.Framework.areEqual(21, array.getByIndex(1), Test_Main.LogLevel.Info, "by index(1)") && passed;
@@ -121,9 +120,8 @@ export class Tests {
         passed = Test_Main.Framework.areEqual(24, array.getById(5), Test_Main.LogLevel.Info, "by id(5)") && passed;
         
         // [11, 21, 24, 12, 31, 32 ]
-        array.insert(4, 2);
-        array.setById(6, 31);
-        array.setById(7, 32);
+        array.setByIndex(4, 31);
+        array.setByIndex(5, 32);
         
         passed = Test_Main.Framework.areEqual(11, array.getByIndex(0), Test_Main.LogLevel.Info, "by index(0)") && passed;
         passed = Test_Main.Framework.areEqual(21, array.getByIndex(1), Test_Main.LogLevel.Info, "by index(1)") && passed;

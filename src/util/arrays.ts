@@ -50,7 +50,7 @@ export class SparseArray<T> {
         return undefined;
     }
     
-    insert(value: T) : number {
+    add(value: T) : number {
         for (let i: number = 0; i < Number.MAX_VALUE; i++) {
             if (this[i] === undefined) {
                 this[i] = value;
@@ -58,7 +58,7 @@ export class SparseArray<T> {
             }
         }
         
-        throw new Util_Errors.Exception(Util_Errors.ErrorCode.IndexOutOfRange, "Cannot insert a new value because this SparseArray is completely full.");
+        throw new Util_Errors.Exception(Util_Errors.ErrorCode.IndexOutOfRange, "Cannot add a new value because this SparseArray is completely full.");
     }
     
     forEach(callback: (i: number) => void) : void {
@@ -73,13 +73,12 @@ export class SparseArray<T> {
 
 
 export class DualSparseArray<T> {
-    _count: number = 0;
     _nextId: number = 0;
     _byId: SparseArray<IndexValue<T>> = new SparseArray<IndexValue<T>>();
     _byIndex: SparseArray<number> = new SparseArray<number>();
     
-    insert(index: number, count?: number) : void {
-        if (index < 0 || index > this._count) {
+    shiftUp(index: number, count?: number) : void {
+        if (index < 0) {
             throw new Util_Errors.Exception(Util_Errors.ErrorCode.IndexOutOfRange);
         }
         
@@ -87,26 +86,23 @@ export class DualSparseArray<T> {
             count = 1;
         }
         
-        // Bump the indeces to open a gap.
+        // Shift up the indeces higher than index.
         this._byId.forEach(i => {
-            if (index <= this._byId[i].index) {
+            if (this._byId[i].index >= index) {
+                // Delete the stale index and stale id.
+                let staleIndex = this._byId[i].index; 
+                let staleId: number = this._byIndex[staleIndex + count];
+                delete this._byIndex[staleIndex];
+                delete this._byId[staleId];
+                 
                 this._byId[i].index += count;
                 this._byIndex[this._byId[i].index] = i;
             }
         });
-        
-        // Init the elements in the gap.
-        for (let i: number = index; i < index + count; i++) {
-            this._byId[this._nextId] = { index: i, value: undefined };
-            this._byIndex[i] = this._nextId;
-            this._nextId++;
-        }
-
-        this._count += count;
     }
     
-    delete(index: number, count?: number) : void {
-        if (index < 0 || index > this._count) {
+    shiftDown(index: number, count?: number) : void {
+        if (index < 0) {
             throw new Util_Errors.Exception(Util_Errors.ErrorCode.IndexOutOfRange);
         }
         
@@ -114,22 +110,19 @@ export class DualSparseArray<T> {
             count = 1;
         }
         
-        // Delete elements. Open a gap among the indeces.
-        for (let i: number = index; i < index + count; i++) {
-            let id: number = this._byIndex[i]; 
-            delete this._byId[id];
-            delete this._byIndex[i];
-        }
-
-        // Shift back the indeces to close the gap.
+        // Shift down the indeces higher than index.
         this._byId.forEach(i => {
-            if (index <= this._byId[i].index) {
+            if (this._byId[i].index >= index) {
+                // Delete the stale index and stale id.
+                let staleIndex = this._byId[i].index; 
+                let staleId: number = this._byIndex[staleIndex - count];
+                delete this._byIndex[staleIndex];
+                delete this._byId[staleId];
+                 
                 this._byId[i].index -= count;
                 this._byIndex[this._byId[i].index] = i;
             }
         });
-
-        this._count -= count; 
     }
     
     getById(id: number) : T {
@@ -141,6 +134,7 @@ export class DualSparseArray<T> {
         // TODO: Remove this method.
         
         if (this._byId[id] === undefined) {
+            //throw new Util_Errors.Exception(Util_Errors.ErrorCode.IndexOutOfRange);
             this._byId[id] = new IndexValue<T>();
         }
         
@@ -149,11 +143,20 @@ export class DualSparseArray<T> {
     
     getByIndex(index: number) : T {
         let id: number = this._byIndex[index];
-        return this._byId[id].value;
+        if (id === undefined) {
+            return undefined;
+        }
+        
+        return this.getById(id);
     }
 
     setByIndex(index: number, value: T) : void {
         let id: number = this._byIndex[index];
+        if (id === undefined) {
+            id = this._nextId++;
+            this._byIndex[index] = id;
+        }
+        
         this._byId[id] = { index: index, value: value };
     }
 

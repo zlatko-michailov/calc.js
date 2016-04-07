@@ -65,9 +65,9 @@ export class App {
     }
     
     ensureCell(cellRef: Platform_Ref.CellRef) : Cell {
-        let sheet: Sheet = this.sheets.getByRefUnit(cellRef.sheetRef);
-        let column: Column = sheet.columns.getByRefUnit(cellRef.columnRef);
-        let cell: Cell = column.cells.getByRefUnit(cellRef.rowRef);
+        let sheet: Sheet = this.sheets.ensureByRefUnit(cellRef.sheetRef);
+        let column: Column = sheet.columns.ensureByRefUnit(cellRef.columnRef);
+        let cell: Cell = column.cells.ensureByRefUnit(cellRef.rowRef);
         
         return cell;
     }
@@ -209,11 +209,11 @@ export class Cell {
             
             // Add the direct consumer to this cell's consumers list.
             let consumerCellRef: Platform_Ref.CellRef = app.sessionState.calcStack.peek(); 
-            this.consumerCellRefs.insert(consumerCellRef);
+            this.consumerCellRefs.add(consumerCellRef);
             
             // Add this cell to the consumer's provider list.
             let consumerCell: Cell = app.ensureCell(consumerCellRef);
-            consumerCell.providerCellRefs.insert(this.ref);
+            consumerCell.providerCellRefs.add(this.ref);
 
             // Recalc the value.
             this.recalcValue();
@@ -296,9 +296,10 @@ class StorageArray<T> extends Util_Arrays.DualSparseArray<T> {
         this.newElement = newElement;
     }
     
-    getByRefUnit(refUnit: Platform_Ref.RefUnit) : T {
+    ensureByRefUnit(refUnit: Platform_Ref.RefUnit) : T {
         let element: T = undefined;
         
+        // TODO: This section should not be needed.
         if (refUnit.kind == Platform_Ref.RefKind.ById) {
             element = this.getById(refUnit.value);
             if (element === undefined) {
@@ -306,7 +307,7 @@ class StorageArray<T> extends Util_Arrays.DualSparseArray<T> {
                 this.setById(refUnit.value, element);
             } 
         }
-        else if (refUnit.kind == Platform_Ref.RefKind.ByIndex) {
+        else {
             element = this.getByIndex(refUnit.value);
             if (element === undefined) {
                 element = this.newElement();
