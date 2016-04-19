@@ -92,6 +92,31 @@ export class App {
                     new Platform_Ref.RefUnit(Platform_Ref.RefKind.ById, rowId), 
                     new Platform_Ref.RefUnit(Platform_Ref.RefKind.ById, sheetId));
     }
+    
+    rewriteRefs(input: string, rewriter: (matches: RegExpMatchArray) => string) : string {
+        const argumentPattern: string = "\\s*([^,\\)]+)\\s*";
+        const optionalArgumentPattern: string = "(," + argumentPattern + ")?"
+        const functionNamePattern: string = "(r\\$?c\\$?)";
+        const refPattern: string = functionNamePattern + "\\s*\\(" + argumentPattern + "," + argumentPattern + optionalArgumentPattern;
+        const regexp: RegExp = new RegExp(refPattern);
+        
+        let rewrittenInput: string = "";
+        
+        while (true) {
+            let match: RegExpMatchArray = input.match(regexp);
+            if (match != null && match.length > 0) {
+                let rewrittenRef = rewriter(match);
+                rewrittenInput += input.substring(0, match.index) + rewrittenRef;
+                input = input.substring(match.index + match[0].length);
+            }
+            else {
+                rewrittenInput += input;
+                break;
+            }
+        }
+        
+        return rewrittenInput;
+    }
 }
 
 

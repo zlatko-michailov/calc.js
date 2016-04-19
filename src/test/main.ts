@@ -33,10 +33,13 @@ export class Framework {
     static run(): boolean {
         let passed: boolean = true;
         
+        this.hacks();
+        
         passed = this._execute("util/arrays:Stack", Test_Util_Arrays.Tests.testStack) && passed;
         passed = this._execute("util/arrays:SparseArray", Test_Util_Arrays.Tests.testSparseArray) && passed;
         passed = this._execute("util/arrays:DualSparseArray", Test_Util_Arrays.Tests.testDualSparseArray) && passed;
         passed = this._execute("util/json:Serializer", Test_Util_JSON.Tests.testSerializer) && passed;
+        passed = this._execute("platform:App.rewriteRefs", Test_Platform_App.Tests.testRewriteRefs) && passed;
         passed = this._execute("platform:App.parseCellInput", Test_Platform_App.Tests.testParseCellInput) && passed;
         passed = this._execute("platform:App.getCellValue", Test_Platform_App.Tests.testGetCellValue) && passed;
         
@@ -46,6 +49,10 @@ export class Framework {
         this.log(LogLevel.Important, "==============");
         
         return passed;
+    }
+    
+    static hacks() : void {
+        // HACK HERE...
     }
     
     static log(level: string, message?: string, ...args: any[]): void {

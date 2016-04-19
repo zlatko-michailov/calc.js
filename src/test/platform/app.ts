@@ -33,6 +33,21 @@ import * as Test_Main from "../main";
 
 
 export class Tests {
+    static testRewriteRefs() : boolean {
+        let app: Platform_App.App = new Platform_App.App();
+        Platform_App.App.currentApp = app;
+        Lib_Global.Global.ensure();
+        
+        let passed: boolean = true;
+        
+        let input: string = "abc + rc(12,34) - r$c   (a +b   ,  56   )*rc$ (  78 ,  c- d  , 90   )+r$c$(e,f,21)";
+        app.rewriteRefs(input, (matches) => {
+            return matches[0];
+        })
+        
+        return passed;
+    }
+    
     static testParseCellInput() : boolean {
         let app: Platform_App.App = new Platform_App.App();
         Platform_App.App.currentApp = app;
