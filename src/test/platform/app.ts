@@ -40,10 +40,25 @@ export class Tests {
         
         let passed: boolean = true;
         
-        let input: string = "abc + rc(12,34) - r$c   (a +b   ,  56   )*rc$ (  78 ,  c- d  , 90   )+r$c$(e,f,21)";
-        app.rewriteRefs(input, (matches) => {
-            return matches[0];
+        let input: string = "abc + rc(12,34) - r$c   (a +b   ,  56   )*rc$ (  78 ,  c- d  , 90   )+r$c$(e,f,21) /  xyz";
+        let expected: string[][] = [
+            [ "rc", "12", "34", undefined ],
+            [ "r$c", "a +b   ", "56   ", undefined ],
+            [ "rc$", "78 ", "c- d  ", "90   " ],
+            [ "r$c$", "e", "f", "21" ]
+        ];
+        let expectedIndex = 0;
+        
+        let rewritten = app.rewriteRefs(input, (matches) => {
+            passed = Test_Main.Framework.areEqual(expected[expectedIndex][0], matches[1], Test_Main.LogLevel.Info, "function") && passed;
+            passed = Test_Main.Framework.areEqual(expected[expectedIndex][1], matches[2], Test_Main.LogLevel.Info, "arg1") && passed;
+            passed = Test_Main.Framework.areEqual(expected[expectedIndex][2], matches[3], Test_Main.LogLevel.Info, "arg2") && passed;
+            passed = Test_Main.Framework.areEqual(expected[expectedIndex][3], matches[5], Test_Main.LogLevel.Info, "arg3") && passed;
+            
+            return (++expectedIndex).toString();
         })
+        
+        passed = Test_Main.Framework.areEqual("abc + 1 - 2*3+4 /  xyz", rewritten, Test_Main.LogLevel.Info, "rewritten") && passed;
         
         return passed;
     }

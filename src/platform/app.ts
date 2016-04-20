@@ -97,7 +97,7 @@ export class App {
         const argumentPattern: string = "\\s*([^,\\)]+)\\s*";
         const optionalArgumentPattern: string = "(," + argumentPattern + ")?"
         const functionNamePattern: string = "(r\\$?c\\$?)";
-        const refPattern: string = functionNamePattern + "\\s*\\(" + argumentPattern + "," + argumentPattern + optionalArgumentPattern;
+        const refPattern: string = functionNamePattern + "\\s*\\(" + argumentPattern + "," + argumentPattern + optionalArgumentPattern + "\\)";
         const regexp: RegExp = new RegExp(refPattern);
         
         let rewrittenInput: string = "";
