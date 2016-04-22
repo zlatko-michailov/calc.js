@@ -93,21 +93,22 @@ export class App {
                     new Platform_Ref.RefUnit(Platform_Ref.RefKind.ById, sheetId));
     }
     
-    rewriteRefs(input: string, rewriter: (matches: RegExpMatchArray) => string) : string {
+    rewriteRefs(cellRef: Platform_Ref.CellRef, input: string, rewriter: (cellRef: Platform_Ref.CellRef, matches: RegExpMatchArray) => string) : string {
         const argumentPattern: string = "\\s*([^,\\)]+)\\s*";
         const optionalArgumentPattern: string = "(," + argumentPattern + ")?"
-        const functionNamePattern: string = "(r\\$?c\\$?)";
+        const functionNamePattern: string = "(rc|_rc|r\\$c\\$)";
         const refPattern: string = functionNamePattern + "\\s*\\(" + argumentPattern + "," + argumentPattern + optionalArgumentPattern + "\\)";
         const regexp: RegExp = new RegExp(refPattern);
         
         let rewrittenInput: string = "";
         
         while (true) {
-            let match: RegExpMatchArray = input.match(regexp);
-            if (match != null && match.length > 0) {
-                let rewrittenRef = rewriter(match);
-                rewrittenInput += input.substring(0, match.index) + rewrittenRef;
-                input = input.substring(match.index + match[0].length);
+            let matches: RegExpMatchArray = input.match(regexp);
+            if (matches != null && matches.length > 0) {
+                let rewrittenRef = rewriter(cellRef, matches);
+                
+                rewrittenInput += input.substring(0, matches.index) + rewrittenRef;
+                input = input.substring(matches.index + matches[0].length);
             }
             else {
                 rewrittenInput += input;
@@ -117,8 +118,83 @@ export class App {
         
         return rewrittenInput;
     }
+    
+    externalRefRewriter(cellRef: Platform_Ref.CellRef, matches: RegExpMatchArray) : string {
+        let rewrittenRef: string = matches[MatchIndex.Whole];
+        
+        if (matches[MatchIndex.Function] == "rc") {
+            let sheetIndex: number = undefined;
+            let sheetId: number = undefined;
+            if (matches[MatchIndex.Arg3] !== undefined) {
+                sheetIndex = this.getArgumentValue(matches, MatchIndex.Arg3, 3);
+                sheetId = this.sheets.getId(sheetIndex);
+            }
+            else {
+                sheetId = cellRef.sheetRef.value; // The cell ref must be by id.
+            }
+        
+            let columnIndex: number = this.getArgumentValue(matches, MatchIndex.Arg2, 2);
+            let columnId: number = this.sheets.getById(sheetId).columns.getId(columnIndex);
+            
+            let rowIndex: number = this.getArgumentValue(matches, MatchIndex.Arg1, 1);
+            let rowId: number = this.sheets.getById(sheetId).columns.getById(columnId).cells.getId(rowIndex);
+            
+            rewrittenRef = "_rc(" + rowId.toString() + ", " + columnId.toString() + ", " + sheetId.toString() + ")";
+        }
+        
+        return rewrittenRef;
+    }
+    
+    internalRefRewriter(cellRef: Platform_Ref.CellRef, matches: RegExpMatchArray) : string {
+        let rewrittenRef: string = matches[MatchIndex.Whole];
+        
+        if (matches[MatchIndex.Function] == "_rc") {
+            let sheetId: number = this.getArgumentValue(matches, MatchIndex.Arg3, 3);
+            let sheetIndex: number = this.sheets.getIndex(sheetId);
+        
+            let columnId: number = this.getArgumentValue(matches, MatchIndex.Arg2, 2);
+            let columnIndex: number = this.sheets.getById(sheetId).columns.getIndex(columnId);
+            
+            let rowId: number = this.getArgumentValue(matches, MatchIndex.Arg1, 1);
+            let rowIndex: number = this.sheets.getById(sheetId).columns.getById(columnId).cells.getIndex(rowId);
+            
+            rewrittenRef = "rc(" + rowId.toString() + ", " + columnId.toString();
+            if (cellRef.sheetRef.value != sheetId) {
+                rewrittenRef += ", " + sheetId.toString();
+            }
+            rewrittenRef += ")";
+        }
+        
+        return rewrittenRef;
+    }
+    
+    getArgumentValue(matches: RegExpMatchArray, matchIndex: number, argumentIndex: number) : number {
+        const errorMessage: string = "Argument " + argumentIndex + " must be a integer number literal - '" + matches[MatchIndex.Whole] + "'.";
+        
+        let numberValue: number = parseFloat(matches[matchIndex]);
+        let intValue: number;
+        if (isNaN(numberValue)) {
+            throw new Util_Errors.Exception(Util_Errors.ErrorCode.InvalidArgument, errorMessage);
+        }
+        
+        intValue = Math.floor(numberValue); 
+        
+        if (intValue != numberValue) {
+            throw new Util_Errors.Exception(Util_Errors.ErrorCode.InvalidArgument, errorMessage);
+        }    
+        
+        return intValue;
+    }
+    
 }
 
+export const enum MatchIndex {
+    Whole = 0,
+    Function = 1,
+    Arg1 = 2,
+    Arg2 = 3,
+    Arg3 = 5
+}
 
 export class Sheet {
     columns: StorageArray<Column> = new StorageArray<Column>(() => new Column());

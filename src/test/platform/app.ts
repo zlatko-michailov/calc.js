@@ -40,25 +40,27 @@ export class Tests {
         
         let passed: boolean = true;
         
-        let input: string = "abc + rc(12,34) - r$c   (a +b   ,  56   )*rc$ (  78 ,  c- d  , 90   )+r$c$(e,f,21) /  xyz";
+        let input: string = "abc + rc(12,34) + rc (56, 78,90)+r$c$ ( e  ,  f , 21 ) - r$c   (a +b   ,  56   )*rc$ (  78 ,  c- d  , 90   ) /  xyz";
         let expected: string[][] = [
             [ "rc", "12", "34", undefined ],
-            [ "r$c", "a +b   ", "56   ", undefined ],
-            [ "rc$", "78 ", "c- d  ", "90   " ],
-            [ "r$c$", "e", "f", "21" ]
+            [ "rc", "56", "78", "90" ],
+            [ "r$c$", "e  ", "f ", "21 " ]
+            //[ "r$c", "a +b   ", "56   ", undefined ],
+            //[ "rc$", "78 ", "c- d  ", "90   " ]
         ];
         let expectedIndex = 0;
         
-        let rewritten = app.rewriteRefs(input, (matches) => {
-            passed = Test_Main.Framework.areEqual(expected[expectedIndex][0], matches[1], Test_Main.LogLevel.Info, "function") && passed;
-            passed = Test_Main.Framework.areEqual(expected[expectedIndex][1], matches[2], Test_Main.LogLevel.Info, "arg1") && passed;
-            passed = Test_Main.Framework.areEqual(expected[expectedIndex][2], matches[3], Test_Main.LogLevel.Info, "arg2") && passed;
-            passed = Test_Main.Framework.areEqual(expected[expectedIndex][3], matches[5], Test_Main.LogLevel.Info, "arg3") && passed;
+        let rewritten = app.rewriteRefs(undefined, input, (dummyCellRef, matches) => {
+            passed = Test_Main.Framework.areEqual(expected[expectedIndex][0], matches[Platform_App.MatchIndex.Function], Test_Main.LogLevel.Info, "function") && passed;
+            passed = Test_Main.Framework.areEqual(expected[expectedIndex][1], matches[Platform_App.MatchIndex.Arg1], Test_Main.LogLevel.Info, "arg1") && passed;
+            passed = Test_Main.Framework.areEqual(expected[expectedIndex][2], matches[Platform_App.MatchIndex.Arg2], Test_Main.LogLevel.Info, "arg2") && passed;
+            passed = Test_Main.Framework.areEqual(expected[expectedIndex][3], matches[Platform_App.MatchIndex.Arg3], Test_Main.LogLevel.Info, "arg3") && passed;
             
             return (++expectedIndex).toString();
         })
         
-        passed = Test_Main.Framework.areEqual("abc + 1 - 2*3+4 /  xyz", rewritten, Test_Main.LogLevel.Info, "rewritten") && passed;
+        let expectedRewritten = "abc + 1 + 2+3 - r$c   (a +b   ,  56   )*rc$ (  78 ,  c- d  , 90   ) /  xyz";
+        passed = Test_Main.Framework.areEqual(expectedRewritten, rewritten, Test_Main.LogLevel.Info, "rewritten") && passed;
         
         return passed;
     }
