@@ -44,9 +44,12 @@ export class App {
         
         // Each cell must keep its own ref by ID.
         cellRef = this.makeCellRefById(cellRef);
-        cell.reset(cellRef);
+        
+        // Rewrite input.
+        let rewrittenInput = this.rewriteRefs(cellRef, input, this.externalRefRewriter);
+        cell.reset(cellRef, input, rewrittenInput);
 
-        cell.parseInput(input);
+        cell.parseInput(rewrittenInput);
     }
     
     getCellValue(cellRef: Platform_Ref.CellRef) : any {
@@ -207,7 +210,8 @@ export class Column {
 
 export class Cell {
     ref: Platform_Ref.CellRef;
-    input: string;
+    externalInput: string;
+    internalInput: string;
     formula: Function;
     value: any;
     providerCellRefs: Util_Arrays.SparseArray<Platform_Ref.CellRef>; 
@@ -218,9 +222,10 @@ export class Cell {
         this.reset();
     }
     
-    reset(ref?: Platform_Ref.CellRef) : void {
+    reset(ref?: Platform_Ref.CellRef, externalInput?: string, internalInput?: string) : void {
         this.ref = ref;
-        this.input = undefined;
+        this.externalInput = externalInput;
+        this.internalInput = internalInput;
         this.formula = undefined;
         this.value = undefined;
         
@@ -257,9 +262,7 @@ export class Cell {
     }
     
     parseInput(input?: string) : void {
-        this.input = input;
-        
-        if (input != undefined) {
+        if (input !== undefined) {
             // Check if the input is a formula.        
             input = input.trim();
             if (input.charAt(0) === "=") {
@@ -291,6 +294,10 @@ export class Cell {
         
         // Recalc this cell and its consumers.
         this.recalc();
+    }
+    
+    getInput() : string {
+        return App.currentApp.rewriteRefs(this.ref, this.internalInput, App.currentApp.internalRefRewriter);
     }
     
     recalc() : void {
@@ -335,7 +342,7 @@ export class Cell {
                         throw ex;
                     }
                     
-                    throw new Util_Errors.Exception(Util_Errors.ErrorCode.InvalidFormula, this.input);
+                    throw new Util_Errors.Exception(Util_Errors.ErrorCode.InvalidFormula, this.getInput());
                 }
             });
         }
