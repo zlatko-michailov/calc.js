@@ -51,30 +51,30 @@ export class Global {
 
     static cr(columnIndex: number, rowIndex: number, sheetIndex?: number) : Platform_Ref.CellRef {
         return new Platform_Ref.CellRef(
-                    new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndexToId, columnIndex), 
-                    new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndexToId, rowIndex), 
-                    new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndexToId, sheetIndex));
+                    new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndex, columnIndex), 
+                    new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndex, rowIndex), 
+                    new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndex, sheetIndex));
     }
 
     static c$r(columnIndex: number, rowIndex: number, sheetIndex?: number) : Platform_Ref.CellRef {
         return new Platform_Ref.CellRef(
                     new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndex, columnIndex), 
-                    new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndexToId, rowIndex), 
-                    new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndexToId, sheetIndex));
+                    new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndex, rowIndex), 
+                    new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndex, sheetIndex));
     }
 
     static cr$(columnIndex: number, rowIndex: number, sheetIndex?: number) : Platform_Ref.CellRef {
         return new Platform_Ref.CellRef(
-                    new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndexToId, columnIndex), 
+                    new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndex, columnIndex), 
                     new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndex, rowIndex), 
-                    new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndexToId, sheetIndex));
+                    new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndex, sheetIndex));
     }
 
     static c$r$(columnIndex: number, rowIndex: number, sheetIndex?: number) : Platform_Ref.CellRef {
         return new Platform_Ref.CellRef(
                     new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndex, columnIndex), 
                     new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndex, rowIndex), 
-                    new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndexToId, sheetIndex));
+                    new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndex, sheetIndex));
     }
 }
 

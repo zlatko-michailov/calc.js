@@ -47,7 +47,6 @@ export class RefUnit {
 }
 
 export const enum RefKind {
-    ByIndexToId = 0,
-    ByIndex = 1,
-    ById = 2,
+    ByIndex = 0,
+    ById = 1,
 }
