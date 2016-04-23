@@ -91,6 +91,12 @@ export class App {
     }
     
     ensureCell(cellRef: Platform_Ref.CellRef) : Cell {
+        if (cellRef.sheetRef.kind == Platform_Ref.RefKind.ById
+            || cellRef.columnRef.kind == Platform_Ref.RefKind.ById
+            || cellRef.rowRef.kind == Platform_Ref.RefKind.ById) {
+                throw new Util_Errors.Exception(Util_Errors.ErrorCode.InvalidArgument, "The CellRef value may not contain a ById unit.");
+            }
+            
         let sheet: Sheet = this.sheets.ensureByRefUnit(cellRef.sheetRef);
         let column: Column = sheet.columns.ensureByRefUnit(cellRef.columnRef);
         let cell: Cell = column.cells.ensureByRefUnit(cellRef.rowRef);
@@ -285,7 +291,7 @@ export class Cell {
             
             // Remove this cell from each provider before removing the provider.
             this.providerCellRefs.forEach(i => {
-                let providerCell = app.ensureCell(this.providerCellRefs[i]);
+                let providerCell = app.getCell(this.providerCellRefs[i]);
                 let consumerCellRefs: Util_Arrays.SparseArray<Platform_Ref.CellRef> = providerCell.consumerCellRefs;
                 let consumerIndex: number = consumerCellRefs.indexOf(this.ref); 
                 if (consumerIndex != undefined) {
@@ -350,7 +356,7 @@ export class Cell {
                 
         // Recalc each consumer cell.
         this.consumerCellRefs.forEach(i => {
-            App.currentApp.ensureCell(this.consumerCellRefs[i]).recalc();
+            App.currentApp.getCell(this.consumerCellRefs[i]).recalc();
         });
     }
     
@@ -364,7 +370,7 @@ export class Cell {
             this.consumerCellRefs.add(consumerCellRef);
             
             // Add this cell to the consumer's provider list.
-            let consumerCell: Cell = app.ensureCell(consumerCellRef);
+            let consumerCell: Cell = app.getCell(consumerCellRef);
             consumerCell.providerCellRefs.add(this.ref);
 
             // Recalc the value.
@@ -449,23 +455,15 @@ class StorageArray<T> extends Util_Arrays.DualSparseArray<T> {
     }
     
     ensureByRefUnit(refUnit: Platform_Ref.RefUnit) : T {
-        let element: T = undefined;
-        
-        // TODO: This section should not be needed.
         if (refUnit.kind == Platform_Ref.RefKind.ById) {
-            element = this.getById(refUnit.value);
-            if (element === undefined) {
-                element = this.newElement();
-                this.setById(refUnit.value, element);
-            } 
+            throw new Util_Errors.Exception(Util_Errors.ErrorCode.InvalidArgument, "The RefUnit value may not be ById.");
         }
-        else {
-            element = this.getByIndex(refUnit.value);
-            if (element === undefined) {
-                element = this.newElement();
-                this.setByIndex(refUnit.value, element);
-            } 
-        }
+
+        let element: T = this.getByIndex(refUnit.value);
+        if (element === undefined) {
+            element = this.newElement();
+            this.setByIndex(refUnit.value, element);
+        } 
         
         return element;
     }

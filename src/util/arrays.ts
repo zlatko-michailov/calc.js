@@ -131,11 +131,10 @@ export class DualSparseArray<T> {
     }
     
     setById(id: number, value: T) : void {
-        // TODO: Remove this method.
-        
         if (this._byId[id] === undefined) {
-            //throw new Util_Errors.Exception(Util_Errors.ErrorCode.IndexOutOfRange);
-            this._byId[id] = new IndexValue<T>();
+            // Add a new element by id is not supported because the index cannot be determined.
+            // New elements may only be added by index.
+            throw new Util_Errors.Exception(Util_Errors.ErrorCode.IndexOutOfRange);
         }
         
         this._byId[id].value = value;
