@@ -42,14 +42,32 @@ export class App {
         // Make sure the cell exists.
         let cell: Cell = this.ensureCell(cellRef);
         
-        // Each cell must keep its own ref by ID.
-        cellRef = this.makeCellRefById(cellRef);
+        // Each cell must keep its own ref by id.
+        let cellRefById = this.makeCellRefById(cellRef);
         
-        // Rewrite input.
-        let rewrittenInput = this.rewriteRefs(cellRef, input, this.externalRefRewriter);
-        cell.reset(cellRef, input, rewrittenInput);
+        // Rewrite refs, and reset cell.
+        cell.reset(cellRefById);
+        let internalInput = this.rewriteRefs(cellRefById, input, this.externalRefRewriter);
+        cell.internalInput = internalInput;
 
-        cell.parseInput(rewrittenInput);
+        cell.parseInput(internalInput);
+    }
+    
+    getCellInput(cellRef: Platform_Ref.CellRef) : string {
+        if (cellRef.sheetRef === undefined) {
+            throw new Util_Errors.Exception(Util_Errors.ErrorCode.InvalidArgument, "The cellRef must be fully qualified, i.e. sheetRef must be set.");
+        }
+        
+        // If the cell doesn't exist, don't create it.
+        let externalInput: string = undefined;
+        let cell: Cell = this.getCell(cellRef);
+        if (cell !== undefined) {
+            // Rewrite refs, and update external input.
+            cell.externalInput = this.rewriteRefs(cell.ref, cell.internalInput, this.internalRefRewriter);
+            externalInput = cell.externalInput;
+        }
+        
+        return externalInput;
     }
     
     getCellValue(cellRef: Platform_Ref.CellRef) : any {
@@ -63,14 +81,44 @@ export class App {
             cellRef.sheetRef = currentCellRef.sheetRef;
         }
 
-        let cell: Cell = this.ensureCell(cellRef);
-        return cell.getValue();
+        let cell: Cell = this.getCell(cellRef);
+        let cellValue: any = undefined;
+        if (cell !== undefined) {
+            cellValue = cell.getValue();
+        }
+        
+        return cellValue;
     }
     
     ensureCell(cellRef: Platform_Ref.CellRef) : Cell {
         let sheet: Sheet = this.sheets.ensureByRefUnit(cellRef.sheetRef);
         let column: Column = sheet.columns.ensureByRefUnit(cellRef.columnRef);
         let cell: Cell = column.cells.ensureByRefUnit(cellRef.rowRef);
+        
+        return cell;
+    }
+    
+    getCell(cellRef: Platform_Ref.CellRef) : Cell {
+        if (cellRef.sheetRef === undefined) {
+            let currentCellRef: Platform_Ref.CellRef = this.sessionState.calcStack.peek();
+            if (currentCellRef === undefined) {
+                throw new Util_Errors.Exception(Util_Errors.ErrorCode.InvalidArgument, "The first cell to be accessed must be fully identified.");
+            }
+            
+            cellRef.sheetRef = currentCellRef.sheetRef;
+        }
+        
+        let sheet: Sheet = this.sheets.getByRefUnit(cellRef.sheetRef);
+        
+        let column: Column = undefined;
+        if (sheet !== undefined) {
+            column = sheet.columns.getByRefUnit(cellRef.columnRef);
+        }
+        
+        let cell: Cell = undefined;
+        if (column !== undefined) {
+            cell = column.cells.getByRefUnit(cellRef.rowRef);
+        }
         
         return cell;
     }
@@ -222,10 +270,10 @@ export class Cell {
         this.reset();
     }
     
-    reset(ref?: Platform_Ref.CellRef, externalInput?: string, internalInput?: string) : void {
+    reset(ref?: Platform_Ref.CellRef) : void {
         this.ref = ref;
-        this.externalInput = externalInput;
-        this.internalInput = internalInput;
+        this.externalInput = undefined;
+        this.internalInput = undefined;
         this.formula = undefined;
         this.value = undefined;
         
@@ -296,10 +344,6 @@ export class Cell {
         this.recalc();
     }
     
-    getInput() : string {
-        return App.currentApp.rewriteRefs(this.ref, this.internalInput, App.currentApp.internalRefRewriter);
-    }
-    
     recalc() : void {
         // Recalc this value.
         this.recalcValue();            
@@ -342,7 +386,7 @@ export class Cell {
                         throw ex;
                     }
                     
-                    throw new Util_Errors.Exception(Util_Errors.ErrorCode.InvalidFormula, this.getInput());
+                    throw new Util_Errors.Exception(Util_Errors.ErrorCode.InvalidFormula, this.externalInput);
                 }
             });
         }
@@ -421,6 +465,19 @@ class StorageArray<T> extends Util_Arrays.DualSparseArray<T> {
                 element = this.newElement();
                 this.setByIndex(refUnit.value, element);
             } 
+        }
+        
+        return element;
+    }
+    
+    getByRefUnit(refUnit: Platform_Ref.RefUnit) : T {
+        let element: T = undefined;
+        
+        if (refUnit.kind == Platform_Ref.RefKind.ById) {
+            element = this.getById(refUnit.value);
+        }
+        else {
+            element = this.getByIndex(refUnit.value);
         }
         
         return element;
