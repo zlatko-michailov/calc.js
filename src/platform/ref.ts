@@ -24,14 +24,14 @@ SOFTWARE.
 
 
 export class CellRef {
-    constructor(columnRef: RefUnit, rowRef: RefUnit, sheetRef?: RefUnit) {
-        this.columnRef = columnRef;
+    constructor(rowRef: RefUnit, columnRef: RefUnit, sheetRef?: RefUnit) {
         this.rowRef = rowRef;
+        this.columnRef = columnRef;
         this.sheetRef = sheetRef;
     }
     
-    columnRef: RefUnit;
     rowRef: RefUnit;
+    columnRef: RefUnit;
     sheetRef: RefUnit;
 }
 

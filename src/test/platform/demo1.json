@@ -1,0 +1,225 @@
+{
+  "sheets": {
+    "_nextId": 1,
+    "_byId": {
+      "0": {
+        "index": 9,
+        "value": {
+          "rows": {
+            "_nextId": 3,
+            "_byId": {
+              "0": {
+                "index": 1,
+                "value": {
+                  "cells": {
+                    "_nextId": 1,
+                    "_byId": {
+                      "0": {
+                        "index": 1,
+                        "value": {
+                          "ref": {
+                            "rowRef": {
+                              "kind": 1,
+                              "value": 0
+                            },
+                            "columnRef": {
+                              "kind": 1,
+                              "value": 0
+                            },
+                            "sheetRef": {
+                              "kind": 1,
+                              "value": 0
+                            }
+                          },
+                          "internalInput": "16",
+                          "value": 16,
+                          "providerCellRefs": {
+                            
+                          },
+                          "consumerCellRefs": {
+                            "0": {
+                              "rowRef": {
+                                "kind": 1,
+                                "value": 1
+                              },
+                              "columnRef": {
+                                "kind": 1,
+                                "value": 0
+                              },
+                              "sheetRef": {
+                                "kind": 1,
+                                "value": 0
+                              }
+                            },
+                            "1": {
+                              "rowRef": {
+                                "kind": 1,
+                                "value": 1
+                              },
+                              "columnRef": {
+                                "kind": 1,
+                                "value": 0
+                              },
+                              "sheetRef": {
+                                "kind": 1,
+                                "value": 0
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "_byIndex": {
+                      "1": 0
+                    }
+                  }
+                }
+              },
+              "1": {
+                "index": 2,
+                "value": {
+                  "cells": {
+                    "_nextId": 1,
+                    "_byId": {
+                      "0": {
+                        "index": 2,
+                        "value": {
+                          "ref": {
+                            "rowRef": {
+                              "kind": 1,
+                              "value": 1
+                            },
+                            "columnRef": {
+                              "kind": 1,
+                              "value": 0
+                            },
+                            "sheetRef": {
+                              "kind": 1,
+                              "value": 0
+                            }
+                          },
+                          "internalInput": "=value(_rc(0, 0, 0)) + 5",
+                          "value": 21,
+                          "providerCellRefs": {
+                            "0": {
+                              "rowRef": {
+                                "kind": 1,
+                                "value": 0
+                              },
+                              "columnRef": {
+                                "kind": 1,
+                                "value": 0
+                              },
+                              "sheetRef": {
+                                "kind": 1,
+                                "value": 0
+                              }
+                            },
+                            "1": {
+                              "rowRef": {
+                                "kind": 1,
+                                "value": 0
+                              },
+                              "columnRef": {
+                                "kind": 1,
+                                "value": 0
+                              },
+                              "sheetRef": {
+                                "kind": 1,
+                                "value": 0
+                              }
+                            }
+                          },
+                          "consumerCellRefs": {
+                            "0": {
+                              "rowRef": {
+                                "kind": 1,
+                                "value": 2
+                              },
+                              "columnRef": {
+                                "kind": 1,
+                                "value": 0
+                              },
+                              "sheetRef": {
+                                "kind": 1,
+                                "value": 0
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "_byIndex": {
+                      "2": 0
+                    }
+                  }
+                }
+              },
+              "2": {
+                "index": 3,
+                "value": {
+                  "cells": {
+                    "_nextId": 1,
+                    "_byId": {
+                      "0": {
+                        "index": 3,
+                        "value": {
+                          "ref": {
+                            "rowRef": {
+                              "kind": 1,
+                              "value": 2
+                            },
+                            "columnRef": {
+                              "kind": 1,
+                              "value": 0
+                            },
+                            "sheetRef": {
+                              "kind": 1,
+                              "value": 0
+                            }
+                          },
+                          "internalInput": "=value(_rc(1, 0, 0)) + 6",
+                          "value": 27,
+                          "providerCellRefs": {
+                            "0": {
+                              "rowRef": {
+                                "kind": 1,
+                                "value": 1
+                              },
+                              "columnRef": {
+                                "kind": 1,
+                                "value": 0
+                              },
+                              "sheetRef": {
+                                "kind": 1,
+                                "value": 0
+                              }
+                            }
+                          },
+                          "consumerCellRefs": {
+                            
+                          }
+                        }
+                      }
+                    },
+                    "_byIndex": {
+                      "3": 0
+                    }
+                  }
+                }
+              }
+            },
+            "_byIndex": {
+              "1": 0,
+              "2": 1,
+              "3": 2
+            }
+          }
+        }
+      }
+    },
+    "_byIndex": {
+      "9": 0
+    }
+  }
+}

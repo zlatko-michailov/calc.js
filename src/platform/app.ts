@@ -47,7 +47,10 @@ export class App {
         
         // Rewrite refs, and reset cell.
         cell.reset(cellRefById);
-        let internalInput = this.rewriteRefs(cellRefById, input, this.externalRefRewriter);
+        let internalInput = this.rewriteRefs(cellRefById, input, 
+                                            (cellRef: Platform_Ref.CellRef, matches: RegExpMatchArray) => { 
+                                                return this.externalRefRewriter(cellRef, matches); 
+                                            });
         cell.internalInput = internalInput;
 
         cell.parseInput(internalInput);
@@ -63,7 +66,10 @@ export class App {
         let cell: Cell = this.getCell(cellRef);
         if (cell !== undefined) {
             // Rewrite refs, and update external input.
-            cell.externalInput = this.rewriteRefs(cell.ref, cell.internalInput, this.internalRefRewriter);
+            cell.externalInput = this.rewriteRefs(cell.ref, cell.internalInput, 
+                                                 (cellRef: Platform_Ref.CellRef, matches: RegExpMatchArray) => { 
+                                                     return this.internalRefRewriter(cellRef, matches); 
+                                                 });
             externalInput = cell.externalInput;
         }
         
@@ -92,14 +98,14 @@ export class App {
     
     ensureCell(cellRef: Platform_Ref.CellRef) : Cell {
         if (cellRef.sheetRef.kind == Platform_Ref.RefKind.ById
-            || cellRef.columnRef.kind == Platform_Ref.RefKind.ById
-            || cellRef.rowRef.kind == Platform_Ref.RefKind.ById) {
+            || cellRef.rowRef.kind == Platform_Ref.RefKind.ById
+            || cellRef.columnRef.kind == Platform_Ref.RefKind.ById) {
                 throw new Util_Errors.Exception(Util_Errors.ErrorCode.InvalidArgument, "The CellRef value may not contain a ById unit.");
             }
             
         let sheet: Sheet = this.sheets.ensureByRefUnit(cellRef.sheetRef);
-        let column: Column = sheet.columns.ensureByRefUnit(cellRef.columnRef);
-        let cell: Cell = column.cells.ensureByRefUnit(cellRef.rowRef);
+        let row: Row = sheet.rows.ensureByRefUnit(cellRef.rowRef);
+        let cell: Cell = row.cells.ensureByRefUnit(cellRef.columnRef);
         
         return cell;
     }
@@ -116,14 +122,14 @@ export class App {
         
         let sheet: Sheet = this.sheets.getByRefUnit(cellRef.sheetRef);
         
-        let column: Column = undefined;
+        let row: Row = undefined;
         if (sheet !== undefined) {
-            column = sheet.columns.getByRefUnit(cellRef.columnRef);
+            row = sheet.rows.getByRefUnit(cellRef.rowRef);
         }
         
         let cell: Cell = undefined;
-        if (column !== undefined) {
-            cell = column.cells.getByRefUnit(cellRef.rowRef);
+        if (row !== undefined) {
+            cell = row.cells.getByRefUnit(cellRef.columnRef);
         }
         
         return cell;
@@ -135,18 +141,18 @@ export class App {
                                     : this.sheets.getId(cellRef.sheetRef.value);
         let sheet: Sheet = this.sheets.getById(sheetId);
          
-        let columnId: number = cellRef.columnRef.kind == Platform_Ref.RefKind.ById 
-                                    ? cellRef.columnRef.value 
-                                    : sheet.columns.getId(cellRef.columnRef.value);
-        let column: Column = sheet.columns.getById(columnId);
-        
         let rowId: number = cellRef.rowRef.kind == Platform_Ref.RefKind.ById 
                                     ? cellRef.rowRef.value 
-                                    : column.cells.getId(cellRef.rowRef.value);
+                                    : sheet.rows.getId(cellRef.rowRef.value);
+        let row: Row = sheet.rows.getById(rowId);
+        
+        let columnId: number = cellRef.columnRef.kind == Platform_Ref.RefKind.ById 
+                                    ? cellRef.columnRef.value 
+                                    : row.cells.getId(cellRef.columnRef.value);
 
         return new Platform_Ref.CellRef(
-                    new Platform_Ref.RefUnit(Platform_Ref.RefKind.ById, columnId), 
                     new Platform_Ref.RefUnit(Platform_Ref.RefKind.ById, rowId), 
+                    new Platform_Ref.RefUnit(Platform_Ref.RefKind.ById, columnId), 
                     new Platform_Ref.RefUnit(Platform_Ref.RefKind.ById, sheetId));
     }
     
@@ -190,11 +196,11 @@ export class App {
                 sheetId = cellRef.sheetRef.value; // The cell ref must be by id.
             }
         
-            let columnIndex: number = this.getArgumentValue(matches, MatchIndex.Arg2, 2);
-            let columnId: number = this.sheets.getById(sheetId).columns.getId(columnIndex);
-            
             let rowIndex: number = this.getArgumentValue(matches, MatchIndex.Arg1, 1);
-            let rowId: number = this.sheets.getById(sheetId).columns.getById(columnId).cells.getId(rowIndex);
+            let rowId: number = this.sheets.getById(sheetId).rows.getId(rowIndex);
+            
+            let columnIndex: number = this.getArgumentValue(matches, MatchIndex.Arg2, 2);
+            let columnId: number = this.sheets.getById(sheetId).rows.getById(rowId).cells.getId(columnIndex);
             
             rewrittenRef = "_rc(" + rowId.toString() + ", " + columnId.toString() + ", " + sheetId.toString() + ")";
         }
@@ -209,15 +215,15 @@ export class App {
             let sheetId: number = this.getArgumentValue(matches, MatchIndex.Arg3, 3);
             let sheetIndex: number = this.sheets.getIndex(sheetId);
         
-            let columnId: number = this.getArgumentValue(matches, MatchIndex.Arg2, 2);
-            let columnIndex: number = this.sheets.getById(sheetId).columns.getIndex(columnId);
-            
             let rowId: number = this.getArgumentValue(matches, MatchIndex.Arg1, 1);
-            let rowIndex: number = this.sheets.getById(sheetId).columns.getById(columnId).cells.getIndex(rowId);
+            let rowIndex: number = this.sheets.getById(sheetId).rows.getIndex(rowId);
             
-            rewrittenRef = "rc(" + rowId.toString() + ", " + columnId.toString();
+            let columnId: number = this.getArgumentValue(matches, MatchIndex.Arg2, 2);
+            let columnIndex: number = this.sheets.getById(sheetId).rows.getById(rowId).cells.getIndex(columnId);
+            
+            rewrittenRef = "rc(" + rowIndex.toString() + ", " + columnIndex.toString();
             if (cellRef.sheetRef.value != sheetId) {
-                rewrittenRef += ", " + sheetId.toString();
+                rewrittenRef += ", " + sheetIndex.toString();
             }
             rewrittenRef += ")";
         }
@@ -254,11 +260,11 @@ export const enum MatchIndex {
 }
 
 export class Sheet {
-    columns: StorageArray<Column> = new StorageArray<Column>(() => new Column());
+    rows: StorageArray<Row> = new StorageArray<Row>(() => new Row());
 }
 
 
-export class Column {
+export class Row {
     cells: StorageArray<Cell> = new StorageArray<Cell>(() => new Cell());
 }
 

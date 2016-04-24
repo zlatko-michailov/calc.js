@@ -34,10 +34,9 @@ export class Global {
         if (!Global._isEnsured) {
             let js = "var CalcJS_Lib_Global = require('../lib/global'); ";
             js += "global.value = function(cellRef) { return CalcJS_Lib_Global.Global.value(cellRef); }; ";
-            js += "global.cr = function(c, r, s) { return CalcJS_Lib_Global.Global.cr(c, r, s); }; ";
-            js += "global.c$r = function(c, r, s) { return CalcJS_Lib_Global.Global.c$r(c, r, s); }; ";
-            js += "global.cr$ = function(c, r, s) { return CalcJS_Lib_Global.Global.cr$(c, r, s); }; ";
-            js += "global.c$r$ = function(c, r, s) { return CalcJS_Lib_Global.Global.c$r$(c, r, s); }; ";
+            js += "global.rc = function(r, c, s) { return CalcJS_Lib_Global.Global.rc(r, c, s); }; ";
+            js += "global.r$c$ = function(r, c, s) { return CalcJS_Lib_Global.Global.r$c$(r, c, s); }; ";
+            js += "global._rc = function(r, c, s) { return CalcJS_Lib_Global.Global._rc(r, c, s); }; ";
             
             eval(js);
             
@@ -49,32 +48,25 @@ export class Global {
         return Platform_App.App.currentApp.getCellValue(cellRef);
     }
 
-    static cr(columnIndex: number, rowIndex: number, sheetIndex?: number) : Platform_Ref.CellRef {
+    static rc(rowIndex: number, columnIndex: number, sheetIndex?: number) : Platform_Ref.CellRef {
         return new Platform_Ref.CellRef(
-                    new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndex, columnIndex), 
                     new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndex, rowIndex), 
+                    new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndex, columnIndex), 
                     new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndex, sheetIndex));
     }
 
-    static c$r(columnIndex: number, rowIndex: number, sheetIndex?: number) : Platform_Ref.CellRef {
+    static r$c$(rowIndex: number, columnIndex: number, sheetIndex?: number) : Platform_Ref.CellRef {
         return new Platform_Ref.CellRef(
-                    new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndex, columnIndex), 
                     new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndex, rowIndex), 
+                    new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndex, columnIndex), 
                     new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndex, sheetIndex));
     }
 
-    static cr$(columnIndex: number, rowIndex: number, sheetIndex?: number) : Platform_Ref.CellRef {
+    static _rc(rowId: number, columnId: number, sheetId?: number) : Platform_Ref.CellRef {
         return new Platform_Ref.CellRef(
-                    new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndex, columnIndex), 
-                    new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndex, rowIndex), 
-                    new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndex, sheetIndex));
-    }
-
-    static c$r$(columnIndex: number, rowIndex: number, sheetIndex?: number) : Platform_Ref.CellRef {
-        return new Platform_Ref.CellRef(
-                    new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndex, columnIndex), 
-                    new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndex, rowIndex), 
-                    new Platform_Ref.RefUnit(Platform_Ref.RefKind.ByIndex, sheetIndex));
+                    new Platform_Ref.RefUnit(Platform_Ref.RefKind.ById, rowId), 
+                    new Platform_Ref.RefUnit(Platform_Ref.RefKind.ById, columnId), 
+                    new Platform_Ref.RefUnit(Platform_Ref.RefKind.ById, sheetId));
     }
 }
 

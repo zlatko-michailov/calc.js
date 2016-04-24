@@ -35,13 +35,13 @@ export class Framework {
         
         this.hacks();
         
-        passed = this._execute("util/arrays:Stack", Test_Util_Arrays.Tests.testStack) && passed;
-        passed = this._execute("util/arrays:SparseArray", Test_Util_Arrays.Tests.testSparseArray) && passed;
-        passed = this._execute("util/arrays:DualSparseArray", Test_Util_Arrays.Tests.testDualSparseArray) && passed;
-        passed = this._execute("util/json:Serializer", Test_Util_JSON.Tests.testSerializer) && passed;
-        passed = this._execute("platform:App.rewriteRefs", Test_Platform_App.Tests.testRewriteRefs) && passed;
-        passed = this._execute("platform:App.parseCellInput", Test_Platform_App.Tests.testParseCellInput) && passed;
-        passed = this._execute("platform:App.getCellValue", Test_Platform_App.Tests.testGetCellValue) && passed;
+        passed = this.execute("util/arrays:Stack", Test_Util_Arrays.Tests.testStack) && passed;
+        passed = this.execute("util/arrays:SparseArray", Test_Util_Arrays.Tests.testSparseArray) && passed;
+        passed = this.execute("util/arrays:DualSparseArray", Test_Util_Arrays.Tests.testDualSparseArray) && passed;
+        passed = this.execute("util/json:Serializer", Test_Util_JSON.Tests.testSerializer) && passed;
+        passed = this.execute("platform:App.rewriteRefs", Test_Platform_App.Tests.testRewriteRefs) && passed;
+        passed = this.execute("platform:App.parseCellInput", Test_Platform_App.Tests.testParseCellInput) && passed;
+        passed = this.execute("platform:App.getCellValue", Test_Platform_App.Tests.testGetCellValue) && passed;
         
         this.log(LogLevel.Important);
         this.log(LogLevel.Important, "==============");
@@ -102,7 +102,7 @@ export class Framework {
         return passed;
     }
     
-    static _execute(testName: string, testMethod: () => boolean): boolean {
+    static execute(testName: string, testMethod: () => boolean): boolean {
         this.log(LogLevel.Important);
         this.log(LogLevel.Important, testName);
         this.log(LogLevel.Important, "---------------------------------------");
