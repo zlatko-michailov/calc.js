@@ -51,7 +51,7 @@ export class App {
                                             (cellRef: Platform_Ref.CellRef, matches: RegExpMatchArray) => { 
                                                 return this.externalRefRewriter(cellRef, matches); 
                                             });
-        cell.internalInput = internalInput;
+        cell.input = internalInput;
 
         cell.parseInput(internalInput);
     }
@@ -65,12 +65,11 @@ export class App {
         let externalInput: string = undefined;
         let cell: Cell = this.getCell(cellRef);
         if (cell !== undefined) {
-            // Rewrite refs, and update external input.
-            cell.externalInput = this.rewriteRefs(cell.ref, cell.internalInput, 
-                                                 (cellRef: Platform_Ref.CellRef, matches: RegExpMatchArray) => { 
-                                                     return this.internalRefRewriter(cellRef, matches); 
-                                                 });
-            externalInput = cell.externalInput;
+            // Rewrite refs.
+            externalInput = this.rewriteRefs(cell.ref, cell.input, 
+                                            (cellRef: Platform_Ref.CellRef, matches: RegExpMatchArray) => { 
+                                                return this.internalRefRewriter(cellRef, matches); 
+                                            });
         }
         
         return externalInput;
@@ -270,8 +269,7 @@ export class Row {
 
 export class Cell {
     ref: Platform_Ref.CellRef;
-    externalInput: string;
-    internalInput: string;
+    input: string;
     formula: Function;
     value: any;
     providerCellRefs: Util_Arrays.SparseArray<Platform_Ref.CellRef>; 
@@ -284,8 +282,7 @@ export class Cell {
     
     reset(ref?: Platform_Ref.CellRef) : void {
         this.ref = ref;
-        this.externalInput = undefined;
-        this.internalInput = undefined;
+        this.input = undefined;
         this.formula = undefined;
         this.value = undefined;
         
@@ -398,7 +395,7 @@ export class Cell {
                         throw ex;
                     }
                     
-                    throw new Util_Errors.Exception(Util_Errors.ErrorCode.InvalidFormula, this.externalInput);
+                    throw new Util_Errors.Exception(Util_Errors.ErrorCode.InvalidFormula, App.currentApp.getCellInput(this.ref));
                 }
             });
         }
