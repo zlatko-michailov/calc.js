@@ -42,6 +42,7 @@ export class Framework {
         passed = this.execute("platform:App.rewriteRefs", Test_Platform_App.Tests.testRewriteRefs) && passed;
         passed = this.execute("platform:App.parseCellInput", Test_Platform_App.Tests.testParseCellInput) && passed;
         passed = this.execute("platform:App.getCellValue", Test_Platform_App.Tests.testGetCellValue) && passed;
+        passed = this.execute("platform:App.demo", Test_Platform_App.Tests.demo) && passed;
         
         this.log(LogLevel.Important);
         this.log(LogLevel.Important, "==============");

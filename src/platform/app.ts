@@ -29,10 +29,30 @@ import * as Util_Errors from "../util/errors";
 import * as Util_JSON from "../util/json";
 
 
-export class App {
+export class App implements Util_JSON.Portable {
     static currentApp: App;
     sessionState: AppSessionState = new AppSessionState(); 
     sheets: StorageArray<Sheet> = new StorageArray<Sheet>(() => new Sheet());
+    
+    export(format: Util_JSON.PortableFormat) : any {
+        let data: any = new Object();
+        data.format = format;
+        data.sheets = this.sheets.export(format);
+        
+        return data;
+    }
+    
+    import(format: Util_JSON.PortableFormat, data: any) : void {
+        this.sheets = new StorageArray<Sheet>(() => new Sheet());
+        this.sheets.import(format, data);
+        
+        if (format == Util_JSON.PortableFormat.Fast) {
+            // TODO: Re-construct each formula.
+        }
+        else {
+            // TODO: Re-parse each cell's input.
+        }
+    }
     
     parseCellInput(cellRef: Platform_Ref.CellRef, input?: string) : void {
         if (cellRef.sheetRef === undefined) {
@@ -247,27 +267,40 @@ export class App {
         
         return intValue;
     }
-    
 }
 
-export const enum MatchIndex {
-    Whole = 0,
-    Function = 1,
-    Arg1 = 2,
-    Arg2 = 3,
-    Arg3 = 5
-}
-
-export class Sheet {
+export class Sheet implements Util_JSON.Portable {
     rows: StorageArray<Row> = new StorageArray<Row>(() => new Row());
+    
+    export(format: Util_JSON.PortableFormat) : any {
+        let data: any = new Object();
+        data.rows = this.rows.export(format);
+        return data;
+    }
+    
+    import(format: Util_JSON.PortableFormat, data: any) : void {
+        this.rows = new StorageArray<Row>(() => new Row());
+        this.rows.import(format, data);
+    }
 }
 
 
-export class Row {
+export class Row implements Util_JSON.Portable {
     cells: StorageArray<Cell> = new StorageArray<Cell>(() => new Cell());
+    
+    export(format: Util_JSON.PortableFormat) : any {
+        let data: any = new Object();
+        data.cells = this.cells.export(format);
+        return data;
+    }
+    
+    import(format: Util_JSON.PortableFormat, data: any) : void {
+        this.cells = new StorageArray<Cell>(() => new Cell());
+        this.cells.import(format, data);
+    }
 }
 
-export class Cell {
+export class Cell implements Util_JSON.Portable {
     ref: Platform_Ref.CellRef;
     input: string;
     formula: Function;
@@ -276,18 +309,53 @@ export class Cell {
     consumerCellRefs: Util_Arrays.SparseArray<Platform_Ref.CellRef>;
     sessionState: CellSessionState;
     
+    export(format: Util_JSON.PortableFormat) : any {
+        let data: any = new Object();
+        data.input = this.input;
+        
+        if (format != Util_JSON.PortableFormat.Short) {
+            data.value = this.value;
+            if (this.providerCellRefs !== undefined && !this.providerCellRefs.isEmpty()) {
+                data.providerCellRefs = Util_JSON.PortableUtil.export(this.providerCellRefs, format);
+            }
+            if (this.consumerCellRefs !== undefined && !this.consumerCellRefs.isEmpty()) {
+                data.consumerCellRefs = Util_JSON.PortableUtil.export(this.consumerCellRefs, format);
+            }
+        }
+
+        return data;
+    }
+    
+    import(format: Util_JSON.PortableFormat, data: any) : void {
+        this.reset();
+         
+        this.input = data.input;
+        
+        if (format != Util_JSON.PortableFormat.Short) {
+            this.value = data.value;
+            if (data.providerCellRefs !== undefined) {
+                this.providerCellRefs.import(format, data.providerCellRefs);
+            }
+            if (this.consumerCellRefs !== undefined) {
+                this.consumerCellRefs.import(format, data.consumerCellRefs);
+            }
+        }
+    }
+    
     constructor() {
         this.reset();
     }
     
     reset(ref?: Platform_Ref.CellRef) : void {
+        let isHardReset: boolean = (ref === undefined);
+        
         this.ref = ref;
         this.input = undefined;
         this.formula = undefined;
         this.value = undefined;
         
-        if (this.providerCellRefs === undefined) {
-            this.providerCellRefs = new Util_Arrays.SparseArray<Platform_Ref.CellRef>();
+        if (this.providerCellRefs === undefined || isHardReset) {
+            this.providerCellRefs = new Util_Arrays.SparseArray<Platform_Ref.CellRef>(() => new Platform_Ref.CellRef(undefined, undefined, undefined));
         }
         else {
             let app = App.currentApp;
@@ -306,11 +374,11 @@ export class Cell {
         }
         
         // Keep the consumers if the collection has been initialized.
-        if (this.consumerCellRefs === undefined) {
-            this.consumerCellRefs = new Util_Arrays.SparseArray<Platform_Ref.CellRef>();
+        if (this.consumerCellRefs === undefined || isHardReset) {
+            this.consumerCellRefs = new Util_Arrays.SparseArray<Platform_Ref.CellRef>(() => new Platform_Ref.CellRef(undefined, undefined, undefined));
         }
         
-        if (this.sessionState === undefined) {
+        if (this.sessionState === undefined || isHardReset) {
             this.sessionState = new CellSessionState();
         }
         else {
@@ -449,12 +517,21 @@ class CellSessionState {
 }
 
 
+export const enum MatchIndex {
+    Whole = 0,
+    Function = 1,
+    Arg1 = 2,
+    Arg2 = 3,
+    Arg3 = 5
+}
+
+
 class StorageArray<T> extends Util_Arrays.DualSparseArray<T> {
-    newElement: () => T;
+    newT: () => T;
     
-    constructor(newElement: () => T) {
-        super();
-        this.newElement = newElement;
+    constructor(newT: () => T) {
+        super(newT);
+        this.newT = newT;
     }
     
     ensureByRefUnit(refUnit: Platform_Ref.RefUnit) : T {
@@ -464,7 +541,7 @@ class StorageArray<T> extends Util_Arrays.DualSparseArray<T> {
 
         let element: T = this.getByIndex(refUnit.value);
         if (element === undefined) {
-            element = this.newElement();
+            element = this.newT();
             this.setByIndex(refUnit.value, element);
         } 
         

@@ -1,4 +1,5 @@
 {
+  "format": 1,
   "sheets": {
     "nextId": 1,
     "byId": {
@@ -17,20 +18,6 @@
                       "0": {
                         "index": 1,
                         "value": {
-                          "ref": {
-                            "rowRef": {
-                              "kind": 1,
-                              "value": 0
-                            },
-                            "columnRef": {
-                              "kind": 1,
-                              "value": 0
-                            },
-                            "sheetRef": {
-                              "kind": 1,
-                              "value": 0
-                            }
-                          },
                           "input": "16",
                           "value": 16,
                           "providerCellRefs": {
@@ -84,20 +71,6 @@
                       "0": {
                         "index": 2,
                         "value": {
-                          "ref": {
-                            "rowRef": {
-                              "kind": 1,
-                              "value": 1
-                            },
-                            "columnRef": {
-                              "kind": 1,
-                              "value": 0
-                            },
-                            "sheetRef": {
-                              "kind": 1,
-                              "value": 0
-                            }
-                          },
                           "input": "=value(_rc(0, 0, 0)) + 5",
                           "value": 21,
                           "providerCellRefs": {
@@ -164,20 +137,6 @@
                       "0": {
                         "index": 3,
                         "value": {
-                          "ref": {
-                            "rowRef": {
-                              "kind": 1,
-                              "value": 2
-                            },
-                            "columnRef": {
-                              "kind": 1,
-                              "value": 0
-                            },
-                            "sheetRef": {
-                              "kind": 1,
-                              "value": 0
-                            }
-                          },
                           "input": "=value(_rc(1, 0, 0)) + 6",
                           "value": 27,
                           "providerCellRefs": {

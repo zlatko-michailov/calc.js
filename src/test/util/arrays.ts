@@ -52,7 +52,7 @@ export class Tests {
     }
     
     static testSparseArray(): boolean {
-        let array: Util_Arrays.SparseArray<number> = new Util_Arrays.SparseArray<number>();
+        let array: Util_Arrays.SparseArray<number> = new Util_Arrays.SparseArray<number>(() => 0);
         let passed: boolean = true;
         
         passed = Test_Main.Framework.isUndefined(array[99], Test_Main.LogLevel.Info, "unsset") && passed;
@@ -70,7 +70,7 @@ export class Tests {
     }
 
     static testDualSparseArray(): boolean {
-        let array: Util_Arrays.DualSparseArray<number> = new Util_Arrays.DualSparseArray<number>();
+        let array: Util_Arrays.DualSparseArray<number> = new Util_Arrays.DualSparseArray<number>(() => 0);
         let passed: boolean = true;
 
         // [ 11, 12 ]        

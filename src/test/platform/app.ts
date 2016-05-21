@@ -23,6 +23,9 @@ SOFTWARE.
 */
 
 
+/// <reference path="../../../typings/node/node.d.ts" />
+import * as Node_FS from "fs";
+
 import * as Platform_App from "../../platform/app";
 import * as Platform_Ref from "../../platform/ref";
 import * as Util_Arrays from "../../util/arrays";
@@ -154,7 +157,11 @@ export class Tests {
         passed = Test_Main.Framework.areEqual(27, val, Test_Main.LogLevel.Info, "27") && passed;
         
         // Hook to get a sample app.
-        let sample = Util_JSON.Serializer.toJSON(app);
+        let sample: string = Util_JSON.Serializer.toJSON(app);
+        let shortExport: any = app.export(Util_JSON.PortableFormat.Short);
+        let shortJSON: string = Util_JSON.Serializer.toJSON(shortExport);
+        let fastExport: any = app.export(Util_JSON.PortableFormat.Fast);
+        let fastJSON: string = Util_JSON.Serializer.toJSON(fastExport);
         
         // Recalc.
         app.parseCellInput(ref1, "3");
@@ -171,6 +178,36 @@ export class Tests {
         // Circular dependency.
         passed = Test_Main.Framework.throws(Util_Errors.ErrorCode.CircularReference, () => app.parseCellInput(ref1, "=value(rc(3, 3, 9)) + 1"), Test_Main.LogLevel.Info, "Circular ref");
         
+        return passed;
+    }
+    
+    static demo() : boolean {
+        let json: string = Node_FS.readFileSync("test/platform/demo1.json", "UTF8");
+        let obj: Object = Util_JSON.Serializer.fromJSON(json);
+        let app: Platform_App.App = new Platform_App.App();
+        
+        Platform_App.App.currentApp = app;
+        Lib_Global.Global.ensure();
+        
+        let passed: boolean = true;
+        
+        /*
+        let ref1 : Platform_Ref.CellRef = Lib_Global.Global.rc(1, 1, 9); 
+        app.parseCellInput(ref1, "50");
+        let val: any = app.getCellValue(ref1);
+        passed = Test_Main.Framework.areEqual("number", typeof val, Test_Main.LogLevel.Info, "typeof 50") && passed;
+        passed = Test_Main.Framework.areEqual(50, val, Test_Main.LogLevel.Info, "50") && passed;
+
+        let ref2 = Lib_Global.Global.rc(2, 2, 9); 
+        val = app.getCellValue(ref2);
+        passed = Test_Main.Framework.areEqual("number", typeof val, Test_Main.LogLevel.Info, "typeof 55") && passed;
+        passed = Test_Main.Framework.areEqual(55, val, Test_Main.LogLevel.Info, "55") && passed;
+        
+        let ref3 = Lib_Global.Global.rc(3, 3, 9); 
+        val = app.getCellValue(ref3);
+        passed = Test_Main.Framework.areEqual("number", typeof val, Test_Main.LogLevel.Info, "typeof 61") && passed;
+        passed = Test_Main.Framework.areEqual(61, val, Test_Main.LogLevel.Info, "61") && passed;
+*/
         return passed;
     }
 }

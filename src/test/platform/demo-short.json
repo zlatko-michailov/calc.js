@@ -1,0 +1,83 @@
+{
+  "format": 0,
+  "sheets": {
+    "nextId": 1,
+    "byId": {
+      "0": {
+        "index": 9,
+        "value": {
+          "rows": {
+            "nextId": 3,
+            "byId": {
+              "0": {
+                "index": 1,
+                "value": {
+                  "cells": {
+                    "nextId": 1,
+                    "byId": {
+                      "0": {
+                        "index": 1,
+                        "value": {
+                          "input": "16"
+                        }
+                      }
+                    },
+                    "byIndex": {
+                      "1": 0
+                    }
+                  }
+                }
+              },
+              "1": {
+                "index": 2,
+                "value": {
+                  "cells": {
+                    "nextId": 1,
+                    "byId": {
+                      "0": {
+                        "index": 2,
+                        "value": {
+                          "input": "=value(_rc(0, 0, 0)) + 5"
+                        }
+                      }
+                    },
+                    "byIndex": {
+                      "2": 0
+                    }
+                  }
+                }
+              },
+              "2": {
+                "index": 3,
+                "value": {
+                  "cells": {
+                    "nextId": 1,
+                    "byId": {
+                      "0": {
+                        "index": 3,
+                        "value": {
+                          "input": "=value(_rc(1, 0, 0)) + 6"
+                        }
+                      }
+                    },
+                    "byIndex": {
+                      "3": 0
+                    }
+                  }
+                }
+              }
+            },
+            "byIndex": {
+              "1": 0,
+              "2": 1,
+              "3": 2
+            }
+          }
+        }
+      }
+    },
+    "byIndex": {
+      "9": 0
+    }
+  }
+}

@@ -23,12 +23,45 @@ SOFTWARE.
 */
 
 
+export interface Portable {
+    export(format: PortableFormat) : any;
+
+    import(format: PortableFormat, data: any) : void;
+}
+
+
+export class PortableUtil {
+    static export(x: any, format: PortableFormat) : any {
+        if (this.isExportable(x)) {
+            return (<Portable><any>x).export(format);
+        }
+        else {
+            return x;
+        }
+    }
+    
+    static isExportable(x: any) : boolean {
+        return (typeof x === "object" && typeof (<any>x)["export"] === "function");
+    }
+    
+    static isImportable(x: any) : boolean {
+        return (typeof x === "object" && typeof (<any>x)["import"] === "function");
+    }
+}
+
+
+export const enum PortableFormat {
+    Short = 0,
+    Fast = 1
+}
+
+
 export class Serializer {
     static toJSON(value: any) : string {
         return JSON.stringify(value, this._replacer);
     }
      
-    static fromJSON(json: string) : any {
+    static fromJSON<T>(json: string) : any {
         return JSON.parse(json);
     }
     
