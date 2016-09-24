@@ -36,34 +36,32 @@ _Complex calculations for every device!_
 ## 1. Overview
 ### 1.1. Spreadsheet
 
-Ever since the spreadsheet was invented, it's been bound to the desktop executable 
+Ever since the spreadsheet was invented, it's been bound to the desktop program 
 that brings it to life - Excel, Lotus, OpenOffice, etc. 
 That led to two problems that we can no longer bear:
-1. Calculations can only be performed on devices where the hosting executable
+
+1. Calculations can only be performed on devices where that program
 can (and is licensed to) run.
 2. All calc apps have the same spreadhseet look an feel.      
 
 
 ### 1.2. Calc App
 
-> __The most fundamental tenet in calc.js is the decoupling of the calc app from
+> __The most fundamental tenet of calc.js is the decoupling of the calc app from
 > the calc engine and from the UI.__
 
-First, what's a calc app? A calc app consists of spreadsheet cell definitions -
-formulas and values, plus some calculation-related settings.
-
-A calc app typically has one or more independent (input) data cells and
-one or more calculation graphs that depend on the input data cells.
-Some calculated cells are "interesting" for consumption (output). 
+What's a calc app? A calc app consists of spreadsheet cell definitions -
+values (independed) and formulas/functions (calculated).
+The independent cells are typically used as input and some of the calculated
+cells are "interesting" as output. 
 
 
 ### 1.3. Calc User Roles
 
-* __Calc Model Designer__ - a person who uses a UI tool to design or update 
-a calculation model.
-The calc app modeler may publish the calc app to a cloud service where it could be
+* __Calc App Developer__ - a person who creates a calculation model.
+The calc app developer may publish the calc app to a cloud service where it could be
 executed remotely.
-* __Mobile App Developer__ - a person that develops a mobile app
+* __Mobile App Developer__ - a person who develops a mobile app
 (that runs on devices with limited capabilities). 
 A mobile app POSTs input values to a cloud service that hosts a given calc app,
 and then GETs the output values from the calc app.
@@ -80,7 +78,7 @@ That way, mobile apps can consume complex calculations on any device.
 ### 1.5. UX
 
 This model enables mobile apps to remain the center of UX -
-they consume the calc app as a service and provide the most appropriate UX for the
+mobile apps consume calc apps as a service, and provide the most appropriate UX for the
 problem they are solving. 
 
 
@@ -89,24 +87,22 @@ problem they are solving.
 calc.js is based on JavaScript - formulas are provided as JavaScript functions
 (or JavaScript expressions for convenience). 
 Thus a formula can reference any JavaScript API.
-Furthermore, the calc model designer can import custom JavaScript files.
-Lastly, although not recommended, a formula can reference any calc.js internal API.
+Furthermore, calc apps can import custom JavaScript files.
 
 
 
 ## 2. How calc.js Can Be Used
 
 1. (Done once.)
-A _calc model designer_ uses a UI tool to design a calc model:
-    * The calc model designer saves the calc model as a _calc app_.
-    * The calc model designer uploads the calc app to a _calc app store_.
+A _calc app developer_ uses a UI tool to develop a _calc app_:
+    * The _calc app developer_ uploads the _calc app_ to a _calc app store_.
 2. (Done many times repeatedly and concurrently.) 
-A _mobile app developer_ develops a mobile app that consumes the calc app as a service:
-    * The mobile app creates a _calc app session_ at a _calc service_ that can
-execute apps from the above calc app store.
-    * The mobile app POSTs values to the necessary cells.
-    * The mobile app GETs the values of some calculated cells.
-    * The mobile app renders the result to the user in its own way. 
+A _mobile app developer_ develops a _mobile app_ that consumes the _calc app_ as a service:
+    * The _mobile app_ creates a _calc app session_ at a _calc service_ that can
+execute _calc apps_ from the above _calc app store_.
+    * The _mobile app_ POSTs values to the necessary cells of the _calc app_.
+    * The _mobile app_ GETs the values of some calculated cells.
+    * The _mobile app_ renders the result to the user in its own way. 
 
 
 
