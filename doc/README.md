@@ -58,7 +58,7 @@ cells are "interesting" as output.
 
 ### 1.3. Calc User Roles
 
-* __Calc App Developer__ - a person who creates a calculation model.
+* __Calc App Developer__ - a person who creates a calc app/model.
 The calc app developer may publish the calc app to a cloud service where it could be
 executed remotely.
 * __Mobile App Developer__ - a person who develops a mobile app
@@ -93,30 +93,35 @@ Furthermore, calc apps can import custom JavaScript files.
 
 ## 2. How calc.js Can Be Used
 
-1. (Done once.)
-A _calc app developer_ uses a UI tool to develop a _calc app_:
-    * The _calc app developer_ uploads the _calc app_ to a _calc app store_.
-2. (Done many times repeatedly and concurrently.) 
-A _mobile app developer_ develops a _mobile app_ that consumes the _calc app_ as a service:
-    * The _mobile app_ creates a _calc app session_ at a _calc service_ that can
-execute _calc apps_ from the above _calc app store_.
-    * The _mobile app_ POSTs values to the necessary cells of the _calc app_.
-    * The _mobile app_ GETs the values of some calculated cells.
-    * The _mobile app_ renders the result to the user in its own way. 
+1. A calc app developer (with the aid of a UI tool) develops a calc app:
+    * The calc app developer uploads the calc app to a calc app store.
+2. A mobile app developer develops a mobile app that consumes the calc app as a service:
+    * The mobile app creates a calc app session at a calc service that can
+execute calc apps.
+    * The mobile app POSTs values to the necessary cells of the calc app.
+    * The mobile app GETs the values of some calculated cells.
+    * The mobile app renders the result to the user in its own way. 
 
 
 
 ## 3. How calc.js Works
 
-A calc app contains a two-dimentional JavaScript array of cells where each cell
-contains a JavaScript function along with its currently calculated value.
-Cell functions reference other cells' values.
-Thus one or more dependency graphs are formed. 
-Whenever a cell's function or value changes, the dependency graphs get recalculated.
+The key storage concept in calc.js is _sparse array_ -
+a structure that looks like a regular array, except that doesn't allocate space for an element
+until it is actually written.
+A calc app is essentially persisted as a 3-dimentional sparse array - 
+a sparse array of sheets that contains a sparse array of rows that contains
+a sparse array of cells.
+
+Each cell has a function (formula) and a current value.
+This way, adding a new cell is pretty efficient even if the new cell depends on other cells.
+
+Additionally, each cell maintains a list of cells that it consumes as well as a list of cell that consume it.
+Whenever a cell's function or value changes, the graph of cells that consume it in any way gets recalculated.
 
 calc.js provides 1 essential function that accesses a cell's value.
 That function detects wrong references as well as circular dependencies.
-Everything else is naturally handled by the JavaScript engine.   
+Everything else is naturally handled by the JavaScript engine.
 
 
 
@@ -206,9 +211,9 @@ function sum(ref1, ref2) {
     
     // Iterate over the range cells
     foreach(ref1, ref2, function(ref) {
-	   // If a cell has a number value, add it to the sum.
+       // If a cell has a number value, add it to the sum.
        var v = value(ref);
-       if (hasValue(ref) && typeof v == "number") {
+       if (hasValue(ref) && typeof v === "number") {
            s += v;
        } 
     });
@@ -236,14 +241,16 @@ You have to explicitly import the desired libraries into the calc apps that need
 Ultimately, that will reflect on the calc app serialization file.
 
 To do it interactively, look up the documentation for the UI tool you are using to
-design your app.
+develop your app.
  
 Keep in mind that libraries are "_referenced_", not "_embedded_", i.e.
 if a library changes after the app has been written, it may affect the app's behavior.
+Therefore, embedding a version into the library name is strongly recommended (although not required),
+e.g. _foo.bar.1.5.js_.
 
 If you plan to use the calc app that imports a particular library only locally,
 then there is no restriction on the location of the JavaScript library.
-However, if you plan to upload that calc app to a remote service, then the library
+However, if you plan to upload that calc app to a shared/public service, then the library
 must be accessible from the service.
     
 
